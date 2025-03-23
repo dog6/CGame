@@ -95,7 +95,7 @@ target_link_libraries(raylib "${LIBS_PRIVATE}")
 # Sets some compile time definitions for the pre-processor
 # If CUSTOMIZE_BUILD option is on you will not use config.h by default
 # and you will be able to select more build options
-include(CompileDefinitions)
+#include(CompileDefinitions)
 
 # Registering include directories
 target_include_directories(raylib
@@ -113,7 +113,7 @@ file(COPY ${raylib_public_headers} DESTINATION "include")
 
 # Includes information on how the library will be installed on the system
 # when cmake --install is run
-include(InstallConfigurations)
+#include(InstallConfigurations)
 
 # Print the flags for the user
 if (DEFINED CMAKE_BUILD_TYPE)
@@ -127,6 +127,6 @@ message(STATUS "  PLATFORM=" ${PLATFORM_CPP})
 message(STATUS "  GRAPHICS=" ${GRAPHICS})
 
 # Options if you want to create an installer using CPack
-include(PackConfigurations)
+#include(PackConfigurations)
 
 enable_testing()

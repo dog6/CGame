@@ -59,6 +59,7 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "xtree": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "stdio.h": "c"
     }
 }

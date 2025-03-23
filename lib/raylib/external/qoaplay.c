@@ -34,6 +34,14 @@
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
 // QOA streaming data descriptor
+#define QOA_IMPLEMENTATION
+
+// Noticed missing includes?
+// #include <stdio.h>
+// #include <stddef.h>
+// #include <string.h>
+// #include "qoa.h"
+
 typedef struct {
     qoa_desc info;                  // QOA descriptor data
 
