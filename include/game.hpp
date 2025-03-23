@@ -12,13 +12,6 @@
 #include <vector>
 #include <stdlib.h>
 #include <stdio.h>
-
-// Local includes-------------------------
-#include "scene.hpp"
-#include "entity.hpp"
-#include "rectangle.hpp"
-#include "shape.hpp"
-// ---------------------------------------
 */
 // Definitions----------------------------
 #define MAX_DYNAMIC_ENTITIES_IN_SCENE 100 // dynamic entites (i.e things with physics)

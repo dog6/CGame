@@ -2,6 +2,8 @@
 #include "entity.hpp"
 #include <vector>
 
+#ifndef SCENE_HPP
+#define SCENE_HPP
 class Scene {
 
     private:
@@ -16,3 +18,4 @@ class Scene {
         void AddEntities(std::vector<Entity> entities); 
         int EntityCount(); 
 };
+#endif

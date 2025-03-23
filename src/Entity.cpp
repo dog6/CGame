@@ -1,8 +1,9 @@
 #include "../include/game.hpp"
 #include "../include/entity.hpp"
 
-Entity::Entity(string name, bool enabled){
+Entity::Entity(string name, Vector2 position, bool enabled){
     this->name = name;
+    this->body = new Rigidbody(position);
     this->isEnabled = enabled;
     this->shape = nullptr;
 }
@@ -22,6 +23,6 @@ void Entity::Update(){
 // Draw entity shape
 void Entity::Draw(){
     if (shape != nullptr){
-        shape->Draw();
+        shape->Draw(body->position);
     }
 }

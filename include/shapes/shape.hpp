@@ -1,5 +1,7 @@
 #include "../game.hpp"
 
+#ifndef SHAPE_HPP
+#define SHAPE_HPP
 // Interface
 class IShape {
     public:
@@ -12,5 +14,6 @@ class IShape {
         
         virtual void setSize(Vector2 size) = 0;
 
-        virtual void Draw() = 0; // draw shape to screen
+        virtual void Draw(Vector2 position) = 0; // draw shape to screen
 };
+#endif
