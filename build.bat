@@ -5,7 +5,6 @@ echo Building Project 🔨
 :: for utf-8 batch
 chcp 65001
 
-
 :: Set source directory
 set SOURCE_DIR=./src
 

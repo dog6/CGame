@@ -3,24 +3,28 @@
 
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
-class Rect : public IShape {
+class Rect: public IShape {
 
     private:
-        Vector2 size;
-        bool visible;
-        Color color;
+    bool visible;
+    Vector2 size;
+    Color color;
 
     public:
-        Rect(Vector2 size, Color color, bool visible = true); // constructor
-        ~Rect(); // deconstructor
-        void setVisible(bool isVisible) override;
-        bool isVisible() override;
+    // constructors
+    Rect();
+    Rect(Vector2 size, Color color, bool visible = true); 
+    ~Rect(); // deconstructor
+    void setVisible(bool isVisible) override;
+    bool isVisible() override;
 
-        Vector2 getSize() override; // get size
-        void setSize(Vector2 size) override; // set size
-        
-        Color getColor() override; // get color
-        
-        void Draw(Vector2 position) override;
+    Vector2 getSize() override; // get size
+    void setSize(Vector2 size) override; // set size
+    
+    Color getColor() override; // get color
+    
+    Rectangle ToRectangle(Vector2 position);
+
+    void Draw(Vector2 position) override;
 };
 #endif

@@ -1,8 +1,8 @@
 #include "../include/game.hpp"
 #include "../include/scene.hpp"
 #include "../include/entity.hpp"
-#include "../include/shapes/rectangle.hpp"
-
+// #include "../include/shapes/rectangle.hpp"
+#include "../include/shapes/tilemap.hpp"
 /* Constructor/Destructor */
 Game::Game(){
     TraceLog(LOG_INFO, "Game started (constructor)");
@@ -41,7 +41,8 @@ void Game::Run(){
 
 // Create scene
 Scene demoScene = Scene("demoScene");
-Entity e = Entity("red rectangle", Vector2{50,50}, true);
+Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
+Entity cursorRectangle = Entity("cursor", Vector2{100,100}, true);
 
 /* Game start */
 void Game::Start(){
@@ -51,24 +52,33 @@ void Game::Start(){
     SetTargetFPS(60);
 
     // Create entities
-    e.shape = new Rect(Vector2{8, 8}, WHITE);
+    float tileSize = 16;
+    Tilemap* map = new Tilemap(Vector2{screenWidth/tileSize,screenHeight/tileSize}, Vector2{tileSize,tileSize}, 1); 
+    tilemap.shape = map;
+    
+    cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // Rectangle 
 
     // Add entites to scene
-    demoScene.AddEntity(e);    
+    demoScene.AddEntity(tilemap);    
+    demoScene.AddEntity(cursorRectangle);
 }
 
 
 /* Update loop */
 void Game::Update(){
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){}
-    else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){}
-    // demoScene.Update();
-}
+    // Update scene
+    demoScene.Update(); // physics
 
+    // Update cursor block
+    Vector2 mousePos = GetMousePosition();
+    Vector2 rectSize = cursorRectangle.shape->getSize(); //cursorRectangle.shape.getSize().y
+    cursorRectangle.body->position = Vector2{mousePos.x-(rectSize.x/2),mousePos.y-(rectSize.y/2)};
+
+}
 
 /* Draw loop */
 void Game::Draw(){
     ClearBackground(BLACK);
-    DrawFPS(20, 20);
     demoScene.Render();
+    DrawFPS(20, 20);
 }
