@@ -27,7 +27,7 @@ add_executable(cgame ${SRC_FILES} ${RAYLIB_SOURCES})
 # Find and link raylib
 # Ensure the raylib directory exists and contains the necessary files
 if(EXISTS ${RAYLIB_DIR}/CMakeLists.txt)
-    add_subdirectory(${RAYLIB_DIR} ${CMAKE_BINARY_DIR}/raylib)
+    add_subdirectory(${RAYLIB_DIR})
 else()
     message(FATAL_ERROR "Raylib directory not found or missing CMakeLists.txt")
 endif()

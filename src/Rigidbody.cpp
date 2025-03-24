@@ -1,8 +1,9 @@
 #include "../include/rigidbody.hpp"
 
-Rigidbody::Rigidbody(Vector2 pos, Vector2 velocity, Vector2 force){
+Rigidbody::Rigidbody(Vector2 pos, Vector2 velocity, Vector2 acceleration, Vector2 force){
     this->position = pos;
     this->velocity = velocity;
+    this->acceleration = acceleration;
     this->force = force;
 }
 

@@ -17,6 +17,8 @@ void Tilemap::setTileData(Color color){
     for (int x = 0; x < size.x; x++){
         for (int y = 0; y < size.y; y++){
             int idx = y*size.x+x;
+            // float tileX = this->position.x+x*(tileSize.x+tileGap);
+            // float tileY = this->position.y+y*(tileSize.y+tileGap);
             float tileX = this->position.x+x*(tileSize.x+tileGap);
             float tileY = this->position.y+y*(tileSize.y+tileGap);
             this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)))); // init default white colored tile @ position
@@ -42,11 +44,11 @@ void Tilemap::setTile(Vector2 pos, Tile tile){
     }
 }
 
-void Tilemap::Draw(Vector2 tilemapPos){
+void Tilemap::draw(Vector2 tilemapPos){
     if (this->visible){ // if whole tilemap is visible
         for (int i = 0; i < tileData.size(); i++){
             if (tileData[i].isVisible()){ // if individual tile is visible
-                tileData[i].Draw(tilemapPos); // draw each tile
+                tileData[i].draw(tilemapPos); // draw each tile
             }
         }
     }

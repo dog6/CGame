@@ -22,5 +22,5 @@ void Ellipse::setSize(Vector2 size){ this->size = size; }
 bool Ellipse::isVisible(){ return this->visible; }
 void Ellipse::setVisible(bool visible){ this->visible = visible; }
 
-void Ellipse::Draw(Vector2 position){ DrawEllipse(position.x, position.y, this->size.x, this->size.y, this->color); }
+void Ellipse::draw(Vector2 position){ DrawEllipse(position.x, position.y, this->size.x, this->size.y, this->color); }
 

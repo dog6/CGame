@@ -22,8 +22,8 @@ void Tile::setSize(Vector2 size) { this->rect.setSize(size); };
 
 Color Tile::getColor() { return this->rect.getColor(); };
 
-void Tile::Draw(Vector2 position) {
-    rect.Draw(this->position);
+void Tile::draw(Vector2 position) {
+    rect.draw(this->position);
 };
 
 Vector2 Tile::getPosition() { return this->position; }

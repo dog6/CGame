@@ -8,8 +8,8 @@ class Entity {
     public:
         Entity(string name, Vector2 position, bool enabled = true); // constructor
         ~Entity();
-        void Draw();    // draw method
-        void Update(); // update method
+        void draw();    // draw method
+        void update(); // update method
         string name;
         bool isEnabled; // is the entity active?
         Rigidbody* body;

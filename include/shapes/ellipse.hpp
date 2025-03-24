@@ -20,7 +20,7 @@ class Ellipse: public IShape {
     void setSize(Vector2 size) override; // set size
     
     Color getColor() override; // get color
-    void Draw(Vector2 position) override;
+    void draw(Vector2 position) override;
 
 };
 #endif

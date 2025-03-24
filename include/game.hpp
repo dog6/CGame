@@ -26,11 +26,11 @@ class Game {
 public: 
     Game(); // constructor
     ~Game(); // destructor
-    void Run(); // game loop
-    void Start(); // called at start of game
-    void Update(); // called once a frame
-    void Draw(); // where everything is drawn
-    void Close(); // called when game closes
+    void run(); // game loop
+    void start(); // called at start of game
+    void update(); // called once a frame
+    void draw(); // where everything is drawn
+    void close(); // called when game closes
 };
 
 #endif // GAME_HPP

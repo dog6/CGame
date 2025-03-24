@@ -15,33 +15,33 @@ Scene::~Scene(){
 }
 
 // adds entitiy to scene
-void Scene::AddEntity(Entity e){
+void Scene::addEntity(Entity e){
     entitiesInScene.push_back(e);
 }
 
 // adds multiple entites to scene
-void Scene::AddEntities(vector<Entity> entities){
+void Scene::addEntities(vector<Entity> entities){
     for (int i = 0; i < entities.size(); i++){
-        Scene::AddEntity(entities[i]);
+        Scene::addEntity(entities[i]);
     }
 }
 
 // renders all entities in the scene
-void Scene::Render(){
+void Scene::render(){
     for (int i = 0; i < entitiesInScene.size(); i++){
         if (entitiesInScene[i].isEnabled){
-            entitiesInScene[i].Draw(); // draw screen
+            entitiesInScene[i].draw(); // draw screen
         }
     }
 }
 
-void Scene::Update(){
+void Scene::update(){
     for (int i = 0; i < entitiesInScene.size(); i++){
-        entitiesInScene[i].Update(); // update all game logic
+        entitiesInScene[i].update(); // update all game logic
     }
 }
 
 // returns number of active entities
-int Scene::EntityCount(){
+int Scene::getEntityCount(){
     return entitiesInScene.size();
 }

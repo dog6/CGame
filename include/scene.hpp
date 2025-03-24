@@ -8,14 +8,16 @@ class Scene {
 
     private:
         string name;
+        Vector2 gravity; // force of 'gravity'
         vector<Entity> entitiesInScene;
     public:
         Scene(string name);
         ~Scene();
-        void Render(); // render entities in scene
-        void Update(); // update entities in scene
-        void AddEntity(Entity entity); 
-        void AddEntities(std::vector<Entity> entities); 
-        int EntityCount(); 
+        void render(); // render entities in scene
+        void update(); // update entities in scene
+        void addEntity(Entity entity); 
+        void addEntities(std::vector<Entity> entities); 
+        void setGravity(Vector2 gravity);
+        int getEntityCount(); 
 };
 #endif

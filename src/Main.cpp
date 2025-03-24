@@ -2,6 +2,6 @@
 int main()
 {
     Game g = Game();
-    g.Run();
+    g.run();
     return 0;
 }

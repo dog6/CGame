@@ -15,14 +15,13 @@ Entity::~Entity(){
     TraceLog(LOG_INFO, buffAsStdStr.c_str());
 }
 
-// Update entity logic
-void Entity::Update(){
-
+// update entity logic
+void Entity::update(){
 }
 
-// Draw entity shape
-void Entity::Draw(){
+// draw entity shape
+void Entity::draw(){
     if (shape != nullptr){
-        shape->Draw(body->position);
+        shape->draw(body->position);
     }
 }

@@ -14,6 +14,6 @@ class IShape {
         
         virtual void setSize(Vector2 size) = 0;
 
-        virtual void Draw(Vector2 position) = 0; // draw shape to screen
+        virtual void draw(Vector2 position) = 0; // draw shape to screen
 };
 #endif

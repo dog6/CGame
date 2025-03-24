@@ -13,28 +13,28 @@ Game::~Game(){
 }
 
 /* Game loop & Exit methods */
-void Game::Close(){
+void Game::close(){
     CloseWindow();        // Close window and OpenGL context
 }
-void Game::Run(){
+void Game::run(){
     // Initialization
-    Game::Start();
+    Game::start();
 
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update
-        Game::Update();
+        Game::update();
 
         // Draw
         BeginDrawing();
-        Game::Draw();
+        Game::draw();
         EndDrawing();
     }
 
     // De-Initialization
-    Game::Close();
+    Game::close();
 }
 /*---------------------------*/
 
@@ -43,16 +43,18 @@ void Game::Run(){
 // Vector2 screenCenter = Vector2{float(GetScreenWidth()/2), float(GetScreenHeight()/2)};
 Vector2 screenCenter = Vector2{float(screenWidth/2), float(screenHeight/2)};
 
+Vector2 mousePos;
+
 // Create scene
 Scene demoScene = Scene("demoScene");
 
-// Create entities      name, position
+// Create entities           name, position
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
 Entity cursorRectangle = Entity("cursor", Vector2{100,100});
 Entity ball = Entity("ball", screenCenter); 
 
 /* Game start */
-void Game::Start(){
+void Game::start(){
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, screenTitle);
@@ -69,6 +71,7 @@ void Game::Start(){
     
     // Create ellipse
     ball.shape = new Ellipse(12, BLACK); // give ball shape
+    ball.body->force = Vector2{0, 1};
     // ball.shape = new Ellipse(Vector2{36, 12}, BLUE); // give ball shape
     
     // Create rectangle
@@ -77,30 +80,30 @@ void Game::Start(){
     /*
     * Add entites to scene
     * Drawn first
-        demoScene.AddEntity(tilemap);    
-        demoScene.AddEntity(cursorRectangle);
-        demoScene.AddEntity(ball); 
+        demoScene.addEntity(tilemap);    
+        demoScene.addEntity(cursorRectangle);
+        demoScene.addEntity(ball); 
     * Drawn last
     */
 
     // Or add multiple entities at once instead
-    demoScene.AddEntities(vector<Entity>{tilemap, ball, cursorRectangle});
+    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle});
 
 }
 
-bool ball_growing = true;
+// bool ball_growing = true;
 
 /* Update loop */
-void Game::Update(){
+void Game::update(){
     
     // Update scene
-    demoScene.Update(); // physics
+    demoScene.update(); // physics
 
     // Update cursor block
-    Vector2 mousePos = GetMousePosition();
-    Vector2 sz = cursorRectangle.shape->getSize(); 
-    cursorRectangle.body->position = Vector2{mousePos.x-(sz.x/2),mousePos.y-(sz.y/2)};
-
+    mousePos = GetMousePosition();
+    cursorRectangle.body->position = Vector2Subtract(mousePos, cursorRectangle.shape->getSize()/2);
+    
+    /* DEMO
     // Increase size of ball (ideally this logic won't live here)
     if (ball_growing){
         ball.shape->setSize(Vector2AddValue(ball.shape->getSize(), 1)); // grow
@@ -114,13 +117,14 @@ void Game::Update(){
         if (ball.shape->getSize().x <= 10){
             ball_growing = true; // Check if min size
         }
-    }
+    }*/
 
 }
 
 /* Draw loop */
-void Game::Draw(){
+void Game::draw(){
     ClearBackground(BLACK); // Bottom drawing
-    demoScene.Render();
+    demoScene.render();
+    DrawLine(screenCenter.x, screenCenter.y, GetMousePosition().x, GetMousePosition().y, GREEN);
     DrawFPS(20, 20);    // Top drawing
 }
