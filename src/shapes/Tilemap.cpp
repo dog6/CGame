@@ -17,10 +17,8 @@ void Tilemap::setTileData(Color color){
     for (int x = 0; x < size.x; x++){
         for (int y = 0; y < size.y; y++){
             int idx = y*size.x+x;
-            // float tileX = this->position.x+x*(tileSize.x+tileGap);
-            // float tileY = this->position.y+y*(tileSize.y+tileGap);
-            float tileX = this->position.x+x*(tileSize.x+tileGap);
-            float tileY = this->position.y+y*(tileSize.y+tileGap);
+            float tileX = this->position.x+x*(tileSize.x+tileGap)+(tileSize.x/2);
+            float tileY = this->position.y+y*(tileSize.y+tileGap)+(tileSize.y/2);
             this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)))); // init default white colored tile @ position
         }
     }
@@ -29,7 +27,7 @@ void Tilemap::setTileData(Color color){
 void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
    // not most performant option
    for (int i = 0; i < tileData.size(); i++){
-    if (CheckCollisionPointRec(pos, tileData[i].rect.ToRectangle(tileData[i].getPosition()))){
+    if (CheckCollisionPointRec(pos, tileData[i].rect.toRectangle(tileData[i].getPosition()))){
         tileData[i].setVisible(isVisible);
     }
 }
@@ -38,7 +36,7 @@ void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
 void Tilemap::setTile(Vector2 pos, Tile tile){
     // not most performant option
     for (int i = 0; i < tileData.size(); i++){
-        if (CheckCollisionPointRec(pos, tileData[i].rect.ToRectangle(tileData[i].getPosition()))){
+        if (CheckCollisionPointRec(pos, tileData[i].rect.toRectangle(tileData[i].getPosition()))){
             tileData[i] = tile;
         }
     }

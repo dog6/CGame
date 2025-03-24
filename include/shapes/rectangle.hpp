@@ -13,6 +13,7 @@ class Rect: public IShape {
     public:
     // constructors
     Rect();
+    Rect(IShape* shape);
     Rect(Vector2 size, Color color, bool visible = true); 
     ~Rect(); // deconstructor
     void setVisible(bool isVisible) override;
@@ -24,7 +25,7 @@ class Rect: public IShape {
     Color getColor() override; // get color
     void draw(Vector2 position) override;
     
-    Rectangle ToRectangle(Vector2 position);
-
+    Rectangle toRectangle(Vector2 position);
+    // float sizeToRadius();
 };
 #endif

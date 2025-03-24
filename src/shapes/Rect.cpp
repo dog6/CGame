@@ -7,6 +7,12 @@ Rect::Rect(Vector2 size, Color color, bool visible){
     this->visible = visible;
 }
 
+Rect::Rect(IShape* shape){
+    this->size = shape->getSize();
+    this->color = shape->getColor();
+    this->visible = shape->isVisible();
+}
+
 Rect::Rect(){
     this->size = Vector2Zero();
     this->color = WHITE;
@@ -27,7 +33,7 @@ void Rect::draw(Vector2 position) {
     DrawRectangleV(position, this->getSize(), this->getColor());
 };
 
-Rectangle Rect::ToRectangle(Vector2 position){
+Rectangle Rect::toRectangle(Vector2 position){
     Rectangle r = Rectangle();
     r.width = this->size.x;
     r.height = this->size.y;

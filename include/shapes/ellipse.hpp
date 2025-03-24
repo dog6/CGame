@@ -11,14 +11,13 @@ class Ellipse: public IShape {
 
     public:
     Ellipse(Vector2 size, Color color, bool visible = true);
+    Ellipse(IShape* shape);
     Ellipse(float radius, Color color, bool visible = true);
     ~Ellipse();
     void setVisible(bool isVisible) override;
     bool isVisible() override;
-
     Vector2 getSize() override; // get size
     void setSize(Vector2 size) override; // set size
-    
     Color getColor() override; // get color
     void draw(Vector2 position) override;
 

@@ -5,6 +5,7 @@ void Tile::setVisible(bool isVisible) { this->visible = isVisible; };
 
 Tile::Tile(Vector2 position, Vector2 size, Color color, bool visible){
     this->position = position;
+    // this->rect = Rect{size, color, true};
     this->rect = Rect{size, color, true};
     this->visible = visible;
 }

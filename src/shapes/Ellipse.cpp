@@ -6,6 +6,12 @@ Ellipse::Ellipse(Vector2 size, Color color, bool visible){
     this->color = color;
 }
 
+Ellipse::Ellipse(IShape* shape){
+    this->size = shape->getSize();
+    this->visible = shape->isVisible();
+    this->color = shape->getColor();
+}
+
 Ellipse::Ellipse(float radius, Color color, bool visible){
     this->size = Vector2{radius*2, radius*2};
     this-> visible = visible;
@@ -22,5 +28,8 @@ void Ellipse::setSize(Vector2 size){ this->size = size; }
 bool Ellipse::isVisible(){ return this->visible; }
 void Ellipse::setVisible(bool visible){ this->visible = visible; }
 
-void Ellipse::draw(Vector2 position){ DrawEllipse(position.x, position.y, this->size.x, this->size.y, this->color); }
+void Ellipse::draw(Vector2 position){ 
+    DrawEllipse(position.x, position.y, this->size.x, this->size.y, this->color);
+    // DrawPoly(position, 32, this->sizeToRadius(), )
+ }
 

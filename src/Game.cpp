@@ -1,7 +1,7 @@
 #include "../include/game.hpp"
 #include "../include/scene.hpp"
 #include "../include/entity.hpp"
-// #include "../include/shapes/rectangle.hpp"
+#include "../include/shapes/rectangle.hpp"
 #include "../include/shapes/ellipse.hpp"
 #include "../include/shapes/tilemap.hpp"
 
@@ -55,7 +55,9 @@ Scene demoScene = Scene("demoScene");
 // Create entities           name, position
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
 Entity cursorRectangle = Entity("cursor", Vector2{100,100});
-Entity ball = Entity("ball", screenCenter); 
+Entity ball = Entity("ball", screenCenter);
+Entity box = Entity("box", Vector2{300, 225});
+// ball.entityType = EntityType::Ellipse;
 
 /* Game start */
 void Game::start(){
@@ -67,9 +69,11 @@ void Game::start(){
     // Create entities
     
     // Create tilemap
-    float tileSize = 50;
+    float tileSize = 10;
     float tileGap = 1;
     Tilemap* map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
+    // Tilemap* map = new Tilemap(Vector2Zero(), Vector2{10,10}, Vector2{tileSize,tileSize}, tileGap); 
+    
     tilemap.shape = map; // give tilemap it's shape
 
     
@@ -78,11 +82,22 @@ void Game::start(){
     ball.body->mass = 0.3; // 0.3 kg
     ball.body->isKinematic = false;
     ball.collideWithCamera = true;
+    ball.entityType = EntityType::Oval;
     // ball.shape = new Ellipse(Vector2{36, 12}, BLUE); // give ball shape
     
-    // Create rectangle
+    // Create cursor rectangle
     cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
-    
+
+    // Create rectangle
+    // box.shape = new Rect(Vector2{25,25}, BLUE);
+    // box.shape = new Box()
+    box.body->mass = 1; // 1 kg
+    box.body->force = Vector2{1, 1};
+    box.body->isKinematic = false;
+    box.collideWithCamera = true;
+    box.entityType = EntityType::Box;
+
+
     /*
     * Add entites to scene
     * Drawn first
@@ -96,7 +111,10 @@ void Game::start(){
     // demoScene.setGravity(Vector2{3, 9.81});
 
     // Or add multiple entities at once instead
-    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle});
+    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle, /*box // <-- issue with box :/ */});
+    
+    // Set scene gravity
+    demoScene.setGravity(Vector2{0, 9.81f});
 
 }
 
@@ -110,16 +128,18 @@ void Game::update(){
 
     // Update cursor block
     mousePos = GetMousePosition();
-    cursorRectangle.body->position = Vector2Subtract(mousePos, cursorRectangle.shape->getSize()/2);
+    cursorRectangle.body->position = mousePos;
 
-
-    // Update gravity of ball
+    // 'Tie' ball to cursor
+   
     float dist = Vector2Distance(ball.body->position, mousePos);
     Vector2 dir = Vector2{ball.body->position.x-mousePos.x, ball.body->position.y-mousePos.y};
-    Vector2 mouseForce = Vector2{-dir.x, -dir.y};
+    Vector2 mouseForce = Vector2{-dir.x*0.5f, -dir.y*0.5f};
     if(dist > 30){
-        demoScene.setGravity(mouseForce);
+        ball.body->force = mouseForce;
     }
+    
+
 
 }
 
