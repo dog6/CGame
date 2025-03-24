@@ -12,3 +12,4 @@ __# Getting started__
 __Building w/ `build.bat` on Windows__
 
     - MinGW in Path enviroment (for G++/GCC)
+    - If you have any issues, verifiy VSCode is using 'CRLF' and not 'LF' for line breaks

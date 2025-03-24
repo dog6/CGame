@@ -4,6 +4,9 @@
 // #include "../include/shapes/rectangle.hpp"
 #include "../include/shapes/ellipse.hpp"
 #include "../include/shapes/tilemap.hpp"
+
+float frame_dt;
+
 /* Constructor/Destructor */
 Game::Game(){
     TraceLog(LOG_INFO, "Game started (constructor)");
@@ -24,6 +27,8 @@ void Game::run(){
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        frame_dt = GetFrameTime();
+
         // Update
         Game::update();
 
@@ -42,7 +47,6 @@ void Game::run(){
 
 // Vector2 screenCenter = Vector2{float(GetScreenWidth()/2), float(GetScreenHeight()/2)};
 Vector2 screenCenter = Vector2{float(screenWidth/2), float(screenHeight/2)};
-
 Vector2 mousePos;
 
 // Create scene
@@ -71,7 +75,9 @@ void Game::start(){
     
     // Create ellipse
     ball.shape = new Ellipse(12, BLACK); // give ball shape
-    ball.body->force = Vector2{0, 1};
+    ball.body->mass = 0.3; // 0.3 kg
+    ball.body->isKinematic = false;
+    ball.collideWithCamera = true;
     // ball.shape = new Ellipse(Vector2{36, 12}, BLUE); // give ball shape
     
     // Create rectangle
@@ -86,6 +92,9 @@ void Game::start(){
     * Drawn last
     */
 
+    // Set scene gravity
+    // demoScene.setGravity(Vector2{3, 9.81});
+
     // Or add multiple entities at once instead
     demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle});
 
@@ -97,27 +106,20 @@ void Game::start(){
 void Game::update(){
     
     // Update scene
-    demoScene.update(); // physics
+    demoScene.update(frame_dt); // physics
 
     // Update cursor block
     mousePos = GetMousePosition();
     cursorRectangle.body->position = Vector2Subtract(mousePos, cursorRectangle.shape->getSize()/2);
-    
-    /* DEMO
-    // Increase size of ball (ideally this logic won't live here)
-    if (ball_growing){
-        ball.shape->setSize(Vector2AddValue(ball.shape->getSize(), 1)); // grow
-        
-        if (ball.shape->getSize().x > 100){
-            ball_growing = false; // Check if max size
-        }
 
-    } else {
-        ball.shape->setSize(Vector2SubtractValue(ball.shape->getSize(), 1)); // shrink
-        if (ball.shape->getSize().x <= 10){
-            ball_growing = true; // Check if min size
-        }
-    }*/
+
+    // Update gravity of ball
+    float dist = Vector2Distance(ball.body->position, mousePos);
+    Vector2 dir = Vector2{ball.body->position.x-mousePos.x, ball.body->position.y-mousePos.y};
+    Vector2 mouseForce = Vector2{-dir.x, -dir.y};
+    if(dist > 30){
+        demoScene.setGravity(mouseForce);
+    }
 
 }
 
@@ -125,6 +127,6 @@ void Game::update(){
 void Game::draw(){
     ClearBackground(BLACK); // Bottom drawing
     demoScene.render();
-    DrawLine(screenCenter.x, screenCenter.y, GetMousePosition().x, GetMousePosition().y, GREEN);
+    DrawLine(ball.body->position.x, ball.body->position.y, GetMousePosition().x, GetMousePosition().y, GREEN);
     DrawFPS(20, 20);    // Top drawing
 }

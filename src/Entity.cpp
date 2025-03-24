@@ -9,14 +9,46 @@ Entity::Entity(string name, Vector2 position, bool enabled){
 }
 
 Entity::~Entity(){
-    char buff[100];
-    snprintf(buff, sizeof(buff), "Deconstructed Entity {}", this->name.c_str());
-    string buffAsStdStr = buff;
-    TraceLog(LOG_INFO, buffAsStdStr.c_str());
+    TraceLog(LOG_INFO, "Destructed ~Entity()");
 }
 
 // update entity logic
-void Entity::update(){
+void Entity::update(float dt, Vector2 forces){
+    if (this->body != nullptr){
+        if (collideWithCamera){ // check for collisions with camera
+            this->collideWithCameraBorders();
+        } 
+        body->update(dt, forces); // update rigidbody physics
+    }
+}
+
+float bounceStrength = 0.8;
+void Entity::collideWithCameraBorders() {
+
+    // Left of camera
+    if (body->position.x-(shape->getSize().x) <= 0){
+        body->position.x = (shape->getSize().x);
+        body->velocity.x *= -0.5;
+    }
+
+    // Right of camera
+    if (body->position.x+(shape->getSize().x) >= screenWidth){
+        body->position.x = screenWidth-(shape->getSize().x);
+        body->velocity.x *= -0.5;
+    }
+
+    // Top of camera
+    if (body->position.y-(shape->getSize().y) <= 0){
+        body->position.y = (shape->getSize().y);
+        body->velocity.y *= -bounceStrength;
+    }
+    // Bottom of camera
+    if (body->position.y+(shape->getSize().y) >= screenHeight){
+        body->position.y = screenHeight-(shape->getSize().y);
+        body->velocity.y *= -bounceStrength;
+    }
+    
+
 }
 
 // draw entity shape

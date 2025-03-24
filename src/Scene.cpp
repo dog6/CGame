@@ -14,6 +14,10 @@ Scene::~Scene(){
     TraceLog(LOG_INFO, buffAsStdStr.c_str());
 }
 
+void Scene::setGravity(Vector2 grav){
+    this->gravity=grav;
+}
+
 // adds entitiy to scene
 void Scene::addEntity(Entity e){
     entitiesInScene.push_back(e);
@@ -35,9 +39,9 @@ void Scene::render(){
     }
 }
 
-void Scene::update(){
+void Scene::update(float dt){
     for (int i = 0; i < entitiesInScene.size(); i++){
-        entitiesInScene[i].update(); // update all game logic
+        entitiesInScene[i].update(dt, this->gravity); // update all game logic
     }
 }
 
