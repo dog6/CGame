@@ -1,4 +1,3 @@
-// #include "../../include/game.hpp"
 #include "../../include/shapes/rectangle.hpp"
 
 // Constructor
@@ -14,8 +13,7 @@ Rect::Rect(){
     this->visible = false;
 }
 
-Rect::~Rect(){
-}
+Rect::~Rect(){} // destructor
 
 bool Rect::isVisible() { return this->visible; };
 void Rect::setVisible(bool isVisible) { this->visible = isVisible; };

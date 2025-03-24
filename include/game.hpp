@@ -9,10 +9,7 @@
 // ---------------------------------------
 #include <string>
 #include <vector>
-/*
-#include <stdlib.h>
-#include <stdio.h>
-*/
+
 // Definitions----------------------------
 #define MAX_DYNAMIC_ENTITIES_IN_SCENE 100 // dynamic entites (i.e things with physics)
 // ---------------------------------------

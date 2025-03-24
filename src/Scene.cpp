@@ -29,7 +29,9 @@ void Scene::AddEntities(vector<Entity> entities){
 // renders all entities in the scene
 void Scene::Render(){
     for (int i = 0; i < entitiesInScene.size(); i++){
-        entitiesInScene[i].Draw(); // draw screen
+        if (entitiesInScene[i].isEnabled){
+            entitiesInScene[i].Draw(); // draw screen
+        }
     }
 }
 

@@ -6,7 +6,7 @@
 #define ENTITY_H
 class Entity {
     public:
-        Entity(string name, Vector2 position, bool enabled); // constructor
+        Entity(string name, Vector2 position, bool enabled = true); // constructor
         ~Entity();
         void Draw();    // draw method
         void Update(); // update method

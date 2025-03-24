@@ -2,6 +2,7 @@
 #include "../include/scene.hpp"
 #include "../include/entity.hpp"
 // #include "../include/shapes/rectangle.hpp"
+#include "../include/shapes/ellipse.hpp"
 #include "../include/shapes/tilemap.hpp"
 /* Constructor/Destructor */
 Game::Game(){
@@ -39,10 +40,16 @@ void Game::Run(){
 
 /* -- Add game code below -- */
 
+// Vector2 screenCenter = Vector2{float(GetScreenWidth()/2), float(GetScreenHeight()/2)};
+Vector2 screenCenter = Vector2{float(screenWidth/2), float(screenHeight/2)};
+
 // Create scene
 Scene demoScene = Scene("demoScene");
+
+// Create entities      name, position
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
-Entity cursorRectangle = Entity("cursor", Vector2{100,100}, true);
+Entity cursorRectangle = Entity("cursor", Vector2{100,100});
+Entity ball = Entity("ball", screenCenter); 
 
 /* Game start */
 void Game::Start(){
@@ -52,33 +59,45 @@ void Game::Start(){
     SetTargetFPS(60);
 
     // Create entities
-    float tileSize = 16;
-    Tilemap* map = new Tilemap(Vector2{screenWidth/tileSize,screenHeight/tileSize}, Vector2{tileSize,tileSize}, 1); 
-    tilemap.shape = map;
-    
-    cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // Rectangle 
+    float tileSize = 50;
+    float tileGap = 1;
+    Tilemap* map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
 
-    // Add entites to scene
-    demoScene.AddEntity(tilemap);    
-    demoScene.AddEntity(cursorRectangle);
+    tilemap.shape = map; // give tilemap it's shape
+    cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
+    ball.shape = new Ellipse(12, BLUE); // give ball shape
+    
+    /*
+    * Add entites to scene
+    * Drawn first
+        demoScene.AddEntity(tilemap);    
+        demoScene.AddEntity(cursorRectangle);
+        demoScene.AddEntity(ball); 
+    * Drawn last
+    */
+
+    // Or add multiple entities at once instead
+    demoScene.AddEntities(vector<Entity>{tilemap, cursorRectangle, ball});
+
 }
 
 
 /* Update loop */
 void Game::Update(){
+    
     // Update scene
     demoScene.Update(); // physics
 
     // Update cursor block
     Vector2 mousePos = GetMousePosition();
-    Vector2 rectSize = cursorRectangle.shape->getSize(); //cursorRectangle.shape.getSize().y
-    cursorRectangle.body->position = Vector2{mousePos.x-(rectSize.x/2),mousePos.y-(rectSize.y/2)};
+    Vector2 sz = cursorRectangle.shape->getSize(); 
+    cursorRectangle.body->position = Vector2{mousePos.x-(sz.x/2),mousePos.y-(sz.y/2)};
 
 }
 
 /* Draw loop */
 void Game::Draw(){
-    ClearBackground(BLACK);
+    ClearBackground(BLACK); // Bottom drawing
     demoScene.Render();
-    DrawFPS(20, 20);
+    DrawFPS(20, 20);    // Top drawing
 }

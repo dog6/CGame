@@ -7,6 +7,7 @@
 class Tilemap: public IShape {
 
     private:
+    Vector2 position; // position of tilemap
     Vector2 size; // width & height
     Vector2 tileSize; // width & height of individual tiles
     vector<Tile> tileData; // arr of tiles
@@ -14,7 +15,7 @@ class Tilemap: public IShape {
 
 
     public: 
-    Tilemap(Vector2 size, Vector2 tile_size, float tile_gap = 0);
+    Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_gap = 0, bool visible = true);
     ~Tilemap();
     void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
     void setTile(Vector2 pos, Tile tile); // set tile

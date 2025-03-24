@@ -1,20 +1,18 @@
 #include "../game.hpp"
 #include "shape.hpp"
 
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
-class Rect: public IShape {
-
+#ifndef ELLIPSE_HPP
+#define ELLIPSE_HPP
+class Ellipse: public IShape {
     private:
     bool visible;
     Vector2 size;
     Color color;
 
     public:
-    // constructors
-    Rect();
-    Rect(Vector2 size, Color color, bool visible = true); 
-    ~Rect(); // deconstructor
+    Ellipse(Vector2 size, Color color, bool visible = true);
+    Ellipse(float radius, Color color, bool visible = true);
+    ~Ellipse();
     void setVisible(bool isVisible) override;
     bool isVisible() override;
 
@@ -23,8 +21,6 @@ class Rect: public IShape {
     
     Color getColor() override; // get color
     void Draw(Vector2 position) override;
-    
-    Rectangle ToRectangle(Vector2 position);
 
 };
 #endif
