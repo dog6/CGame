@@ -31,11 +31,9 @@ void Entity::update(float dt, Vector2 forces){
 
 float bounceStrength = 0.4;
 void Entity::collideWithCameraBorders() {
-
     if (collideWithCamera){
         vector<Vector2> verts = this->shape->getVertices(this->body->position);
         for (int v = 0; v < verts.size(); v++){
-
             if (verts[v].x >= screenWidth){
                 body->position.x -= Vector2Distance(verts[v], Vector2{screenWidth, verts[v].y});
                 body->velocity.x *= -bounceStrength;
@@ -53,10 +51,7 @@ void Entity::collideWithCameraBorders() {
                 body->position.y += Vector2Distance(verts[v], Vector2{verts[v].x, 0});
                 body->velocity.y *= -bounceStrength;
             }
-
-
         }
-
         /*
         // Left of camera
         if (body->position.x-(shape->getSize().x) <= 0){
@@ -103,17 +98,46 @@ void Entity::handleCollision(vector<Entity> entities){
             continue; // don't collide with self
         }
 
-        DrawLineV(entities[i].body->position, this->body->position, RED);
         // Handle collision (SAT)
         // Draw ray
         // colA = this->body->position;
         // colB = entities[i].body->position;
         // DrawLineV(entities[i].body->position, this->body->position, RED);
+        /*Entity entityA = *this;
+        Entity entityB = entities[i];
+        Vector2 a = entityA.body->position;
+        Vector2 b = entityB.body->position;
+
+
+        vector<Vector2> aVertices = entityA.shape->getVertices(a);
+     vector<Line> bLines = entityA.shape->getLines(b);
+
+        // for each vertex
+        for (int j = 0; j < aVertices.size(); j += 2){
+            for (int l = 0; l < bLines.size(); l++){
+            Vector2 aP = aVertices[j];
+
+            // vertex falls horizontally in line
+            if (aP.x > bLines[l].startPoint.x && aP.x < bLines[l].endPoint.x)
+                if (aP.y > bLines[l].startPoint.y && aP.y < bLines[l].endPoint.y){
+                    // vertex is colliding with bLine
+                    entityA.body->velocity *= -1;
+                    entityB.body-> velocity *= -1;
+                }
+            }*/
+            /* if a falls in vertical shading of b
+            if (aP.x > bP.x && aP.x < bP.x){
+                // if a falls in horizontal shading of b
+                if (aP.y > bP.y && aP.y < bP.y){
+
+                }
+            }*/
+        }
 
    
     }
 
-}
+// }
 
 
 // draw entity shape

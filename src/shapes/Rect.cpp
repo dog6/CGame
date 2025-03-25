@@ -1,5 +1,7 @@
+// #include "../../include/shapes/shape.hpp"
+#include "../../include/shapes/shape.hpp"
 #include "../../include/shapes/rectangle.hpp"
-
+// #include "../../include/line.hpp"
 // Constructor
 Rect::Rect(Vector2 size, Color color, bool visible){
     this->size = size;
@@ -37,19 +39,11 @@ void Rect::draw(Vector2 position, float rot) {
 
 vector<Vector2> Rect::getVertices(Vector2 pos){
     vector<Vector2> result;
-    // TL,TR,BR,BL, so they're inserted backwards
-    // Vector2 sz = this->getSize();
-    /*result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
-    result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
-    result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
-    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL */
-
     Rectangle r = this->toRectangle(pos);
     result.push_back(Vector2{pos.x-(r.width), pos.y+(r.height)});
     result.push_back(Vector2{pos.x+(r.width), pos.y+(r.height)});
     result.push_back(Vector2{pos.x+(r.width), pos.y-(r.height)});
     result.push_back(Vector2{pos.x-(r.width), pos.y-(r.height)});
-
     return result;
   }
 
@@ -61,3 +55,13 @@ Rectangle Rect::toRectangle(Vector2 position){
     r.y = position.y;
     return r;
 }
+/*
+vector<Line> Rect::getLines(Vector2 pos){
+    vector<Line> result;
+    vector<Vector2> points = this->getVertices(pos);
+    // for each point, make a line
+    for (int i = 0; i <= points.size(); i += 2){
+        result.push_back(new Line(points[i], points[i+1], RED));
+    }
+    return result;
+}*/

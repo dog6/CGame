@@ -30,13 +30,35 @@ void Tile::draw(Vector2 position, float rot) {
 vector<Vector2> Tile::getVertices(Vector2 pos){
     vector<Vector2> result;
     // TL,TR,BR,BL, so they're inserted backwards
-    Vector2 sz = this->getSize();
-    result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
-    result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
-    result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
-    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+    Rectangle r = this->toRectangle(pos);
+    result.push_back(Vector2{pos.x-(r.width), pos.y+(r.height)});
+    result.push_back(Vector2{pos.x+(r.width), pos.y+(r.height)});
+    result.push_back(Vector2{pos.x+(r.width), pos.y-(r.height)});
+    result.push_back(Vector2{pos.x-(r.width), pos.y-(r.height)});
     return result;
+}
+
+Rectangle Tile::toRectangle(Vector2 pos) {
+    Rectangle r = Rectangle();
+    Vector2 sz = this->getSize();
+    r.width = sz.x;
+    r.height = sz.y;
+    r.x = pos.x;
+    r.y = pos.y;
+    return r;
 }
 
 Vector2 Tile::getPosition() { return this->position; }
 void Tile::setPosition(Vector2 pos) {this->position = pos;}
+
+/*
+vector<Line> Tile::getLines(Vector2 pos){
+    vector<Line> result;
+    vector<Vector2> points = this->getVertices(pos);
+    // for each point, make a line
+    for (int i = 0; i <= points.size(); i += 2){
+        result.push_back(new Line(points[i], points[i+1], RED));
+    }
+    return result;
+}
+    */

@@ -25,6 +25,7 @@ class Box: public IShape {
     void setColor(Color color) override;
     void draw(Vector2 position, float rot) override;
     vector<Vector2> getVertices(Vector2 pos) override; // get vertices
+    // vector<Line> getLines(Vector2 pos) override;
     
     Rectangle toRectangle(Vector2 position);
     

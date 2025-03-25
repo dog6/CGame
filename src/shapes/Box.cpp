@@ -46,12 +46,23 @@ Rectangle Box::toRectangle(Vector2 position){
 vector<Vector2> Box::getVertices(Vector2 pos){
   vector<Vector2> result;
   // TL,TR,BR,BL, so they're inserted backwards
-  Vector2 sz = this->getSize();
-  result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
-  result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
-  result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
-  result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+  Rectangle r = this->toRectangle(pos);
+  result.push_back(Vector2{pos.x-(r.width), pos.y+(r.height)});
+  result.push_back(Vector2{pos.x+(r.width), pos.y+(r.height)});
+  result.push_back(Vector2{pos.x+(r.width), pos.y-(r.height)});
+  result.push_back(Vector2{pos.x-(r.width), pos.y-(r.height)});
   return result;
 }
+
+/*
+vector<Line> Box::getLines(Vector2 pos){
+  vector<Line> result;
+  vector<Vector2> points = this->getVertices(pos);
+  // for each point, make a line
+  for (int i = 0; i <= points.size(); i += 2){
+      result.push_back(new Line(points[i], points[i+1], RED));
+  }
+  return result;
+}*/
 
 void Box::setColor(Color color) { this->color = color; }

@@ -26,10 +26,13 @@ class Tile: public IShape {
     void draw(Vector2 position, float rot) override; // draw tile to screen
     vector<Vector2> getVertices(Vector2 pos) override;
     
+    
     // Tile only
     Rect* rect;
     Vector2 getPosition(); // get position
     void setPosition(Vector2 pos); // set position
+    Rectangle toRectangle(Vector2 pos); // convert tile to raylib rectangle
+
 
 };
 #endif
