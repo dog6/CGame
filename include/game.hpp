@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 // #include <math.h> breaks stuff (Vector2 from raylib)
+#include "smallmath.hpp"
+
 
 // Definitions----------------------------
 #define MAX_DYNAMIC_ENTITIES_IN_SCENE 100 // dynamic entites (i.e things with physics)

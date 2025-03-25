@@ -11,7 +11,7 @@ class IShape {
 
         virtual Vector2 getSize() = 0;
         virtual Color getColor() = 0;
-        
+        virtual void setColor(Color color) = 0;
         virtual void setSize(Vector2 size) = 0;
 
         virtual vector<Vector2> getVertices(Vector2 pos) = 0;

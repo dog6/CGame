@@ -22,6 +22,7 @@ class Box: public IShape {
     Vector2 getSize() override; // get size
     void setSize(Vector2 size) override; // set size
     Color getColor() override; // get color
+    void setColor(Color color) override;
     void draw(Vector2 position) override;
     vector<Vector2> getVertices(Vector2 pos) override; // get vertices
     

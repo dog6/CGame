@@ -51,12 +51,14 @@ Vector2 mousePos;
 // Create scene
 Scene demoScene = Scene("demoScene");
 
+// Initialize tilemap pointer
+Tilemap* map;
+
 // Create entities           name, position
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
-Entity cursorRectangle = Entity("cursor", Vector2{100,100});
+// Entity cursorRectangle = Entity("cursor", Vector2{100,100});
 Entity ball = Entity("ball", screenCenter);
 Entity box = Entity("box", Vector2{300, 225});
-
 /* Game start */
 void Game::start(){
 
@@ -69,7 +71,7 @@ void Game::start(){
     // Create tilemap
     float tileSize = 10;
     float tileGap = 1;
-    Tilemap* map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
+    map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
     
     tilemap.shape = map; // give tilemap it's shape
 
@@ -81,7 +83,7 @@ void Game::start(){
     ball.collideWithCamera = true;
     
     // Create cursor rectangle
-    cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
+    // cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
 
     // Create box (WIP)
     /*box.body->mass = 1; // 1 kg
@@ -94,7 +96,7 @@ void Game::start(){
     // demoScene.setGravity(Vector2{0, 9.81});
 
     // Or add multiple entities at once instead
-    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle /* <-- issue with box :/ */});
+    demoScene.addEntities(vector<Entity>{tilemap, ball, /*cursorRectangle*/  /*box <-- issue with box :/ */});
     
     // Set scene gravity
     demoScene.setGravity(Vector2{0, 9.81f});
@@ -107,7 +109,7 @@ void demoCode(){
 
     // Update cursor block
     mousePos = GetMousePosition();
-    cursorRectangle.body->position = mousePos;
+    // cursorRectangle.body->position = mousePos;
 
     // 'Tie' ball to cursor ( kinda bad, just for demo )
     if (ballTiedToCursor) {
@@ -124,6 +126,15 @@ void demoCode(){
         ballTiedToCursor = !ballTiedToCursor;
     }
     
+    // Change tile color
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        // TraceLog(LOG_INFO, string("Clicked tile @ mouse position " + to_string(mousePos.x) + ", " + to_string(mousePos.y)).c_str());
+        Tile* hoveredTile = map->getTile(mousePos);
+        if (hoveredTile != nullptr){
+            hoveredTile->rect->setColor(RED);
+        }
+    }
+
 }
 // ----------------------------
 

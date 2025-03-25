@@ -28,6 +28,7 @@ Vector2 Rect::getSize() { return this->size; };
 void Rect::setSize(Vector2 size) { this->size = size; };
 
 Color Rect::getColor() { return this->color; };
+void Rect::setColor(Color color) { this->color = color; };
 
 void Rect::draw(Vector2 position) {
     DrawRectangleV(position, this->getSize(), this->getColor());

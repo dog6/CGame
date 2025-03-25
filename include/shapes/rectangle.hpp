@@ -23,6 +23,7 @@ class Rect: public IShape {
     void setSize(Vector2 size) override; // set size
     
     Color getColor() override; // get color
+    void setColor(Color color) override; // set color
     void draw(Vector2 position) override;
     vector<Vector2> getVertices(Vector2 pos) override;
     

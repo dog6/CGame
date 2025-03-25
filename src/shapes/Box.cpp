@@ -53,3 +53,5 @@ vector<Vector2> Box::getVertices(Vector2 pos){
   result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
   return result;
 }
+
+void Box::setColor(Color color) { this->color = color; }

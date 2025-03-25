@@ -21,12 +21,13 @@ class Tile: public IShape {
     void setSize(Vector2 size) override; // set size
     
     Color getColor() override; // get color
-    
+    void setColor(Color color) override;
+
     void draw(Vector2 position) override; // draw tile to screen
     vector<Vector2> getVertices(Vector2 pos) override;
-
+    
     // Tile only
-    Rect rect;
+    Rect* rect;
     Vector2 getPosition(); // get position
     void setPosition(Vector2 pos); // set position
 

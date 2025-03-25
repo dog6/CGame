@@ -20,6 +20,7 @@ class Tilemap: public IShape {
     void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
     void setTile(Vector2 pos, Tile tile); // set tile
     void setTileData(Color color); // sets all tiles 
+    Tile* getTile(Vector2 pos); //gets hovered tile
     bool visible;
     float tileGap = 0;
 
@@ -30,6 +31,7 @@ class Tilemap: public IShape {
     bool isVisible() override;
     Vector2 getSize() override;
     Color getColor() override;
+    void setColor(Color color) override;
     void setSize(Vector2 size) override;
     void draw(Vector2 position) override; // draws tilemap
     vector<Vector2> getVertices(Vector2 pos) override;

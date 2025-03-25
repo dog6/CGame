@@ -9,6 +9,6 @@ class Smallmath {
   ~Smallmath(); // destructor
   static Vector2 radiusToSize(float r);
   static float sizeToRadius(Vector2 v);
-
+  static float Vector2Product(Vector2 v);
 };
 #endif

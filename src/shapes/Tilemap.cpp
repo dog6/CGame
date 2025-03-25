@@ -27,7 +27,7 @@ void Tilemap::setTileData(Color color){
 void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
    // not most performant option
    for (int i = 0; i < tileData.size(); i++){
-    if (CheckCollisionPointRec(pos, tileData[i].rect.toRectangle(tileData[i].getPosition()))){
+    if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
         tileData[i].setVisible(isVisible);
     }
 }
@@ -36,10 +36,27 @@ void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
 void Tilemap::setTile(Vector2 pos, Tile tile){
     // not most performant option
     for (int i = 0; i < tileData.size(); i++){
-        if (CheckCollisionPointRec(pos, tileData[i].rect.toRectangle(tileData[i].getPosition()))){
+        if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
             tileData[i] = tile;
         }
     }
+}
+
+Tile* Tilemap::getTile(Vector2 pos){
+    int tC = 0;
+    for (int i = 0; i < tileData.size(); i++){
+        // Check distance from tile to point
+        if (Vector2Distance(tileData[i].getPosition(), pos) > 10){
+            tC++; 
+            continue;
+        }
+
+        if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
+            // TraceLog(LOG_INFO, string("Skipped " + to_string(tC) + " tiles.").c_str());
+            return &tileData[i];
+        }
+    }
+    return nullptr;
 }
 
 void Tilemap::draw(Vector2 tilemapPos){
@@ -69,3 +86,4 @@ vector<Vector2> Tilemap::getVertices(Vector2 pos){
   }
 // Does nothing for tilemap
 Color Tilemap::getColor() { return WHITE; };
+void Tilemap::setColor(Color color) { setTileData(color); };

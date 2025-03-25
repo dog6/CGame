@@ -21,6 +21,7 @@ Ellipse::Ellipse(float radius, Color color, bool visible){
 Ellipse::~Ellipse(){} // destructor
 
 Color Ellipse::getColor(){ return this->color; }
+void Ellipse::setColor(Color color){this->color = color;}
 
 Vector2 Ellipse::getSize(){ return this->size; }
 void Ellipse::setSize(Vector2 size){ this->size = size; }
