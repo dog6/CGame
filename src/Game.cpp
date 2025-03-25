@@ -45,7 +45,6 @@ void Game::run(){
 
 /* -- Add game code below -- */
 
-// Vector2 screenCenter = Vector2{float(GetScreenWidth()/2), float(GetScreenHeight()/2)};
 Vector2 screenCenter = Vector2{float(screenWidth/2), float(screenHeight/2)};
 Vector2 mousePos;
 
@@ -57,7 +56,6 @@ Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
 Entity cursorRectangle = Entity("cursor", Vector2{100,100});
 Entity ball = Entity("ball", screenCenter);
 Entity box = Entity("box", Vector2{300, 225});
-// ball.entityType = EntityType::Ellipse;
 
 /* Game start */
 void Game::start(){
@@ -72,7 +70,6 @@ void Game::start(){
     float tileSize = 10;
     float tileGap = 1;
     Tilemap* map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
-    // Tilemap* map = new Tilemap(Vector2Zero(), Vector2{10,10}, Vector2{tileSize,tileSize}, tileGap); 
     
     tilemap.shape = map; // give tilemap it's shape
 
@@ -82,43 +79,53 @@ void Game::start(){
     ball.body->mass = 0.3; // 0.3 kg
     ball.body->isKinematic = false;
     ball.collideWithCamera = true;
-    ball.entityType = EntityType::Oval;
-    // ball.shape = new Ellipse(Vector2{36, 12}, BLUE); // give ball shape
     
     // Create cursor rectangle
     cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
 
-    // Create rectangle
-    // box.shape = new Rect(Vector2{25,25}, BLUE);
-    // box.shape = new Box()
-    box.body->mass = 1; // 1 kg
+    // Create box (WIP)
+    /*box.body->mass = 1; // 1 kg
     box.body->force = Vector2{1, 1};
     box.body->isKinematic = false;
     box.collideWithCamera = true;
-    box.entityType = EntityType::Box;
-
-
-    /*
-    * Add entites to scene
-    * Drawn first
-        demoScene.addEntity(tilemap);    
-        demoScene.addEntity(cursorRectangle);
-        demoScene.addEntity(ball); 
-    * Drawn last
-    */
+    box.entityType = EntityType::Box;*/
 
     // Set scene gravity
-    // demoScene.setGravity(Vector2{3, 9.81});
+    // demoScene.setGravity(Vector2{0, 9.81});
 
     // Or add multiple entities at once instead
-    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle, /*box // <-- issue with box :/ */});
+    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle /* <-- issue with box :/ */});
     
     // Set scene gravity
     demoScene.setGravity(Vector2{0, 9.81f});
 
 }
 
-// bool ball_growing = true;
+// Demo------------------------
+bool ballTiedToCursor = false;
+void demoCode(){
+
+    // Update cursor block
+    mousePos = GetMousePosition();
+    cursorRectangle.body->position = mousePos;
+
+    // 'Tie' ball to cursor ( kinda bad, just for demo )
+    if (ballTiedToCursor) {
+        float dist = Vector2Distance(ball.body->position, mousePos);                                // get distance from ball to cursor
+        Vector2 dir = Vector2Normalize(Vector2{ball.body->position.x-mousePos.x, ball.body->position.y-mousePos.y});  // getting direction from ball to cursor
+        Vector2 mouseForce = Vector2{dir.x*(demoScene.getGravity().x-3), -dir.y*(demoScene.getGravity().y+3)};                                         // getting 'mouseForce' (direction*0.5f)
+        if(dist > 30){
+            ball.body->force = mouseForce;
+        }
+    }
+
+    // Toggle ballTiedToCursor boolean
+    if (GetKeyPressed() == KeyboardKey::KEY_SPACE){
+        ballTiedToCursor = !ballTiedToCursor;
+    }
+    
+}
+// ----------------------------
 
 /* Update loop */
 void Game::update(){
@@ -126,20 +133,7 @@ void Game::update(){
     // Update scene
     demoScene.update(frame_dt); // physics
 
-    // Update cursor block
-    mousePos = GetMousePosition();
-    cursorRectangle.body->position = mousePos;
-
-    // 'Tie' ball to cursor
-   
-    float dist = Vector2Distance(ball.body->position, mousePos);
-    Vector2 dir = Vector2{ball.body->position.x-mousePos.x, ball.body->position.y-mousePos.y};
-    Vector2 mouseForce = Vector2{-dir.x*0.5f, -dir.y*0.5f};
-    if(dist > 30){
-        ball.body->force = mouseForce;
-    }
-    
-
+    demoCode(); // for demo
 
 }
 
@@ -147,6 +141,6 @@ void Game::update(){
 void Game::draw(){
     ClearBackground(BLACK); // Bottom drawing
     demoScene.render();
-    DrawLine(ball.body->position.x, ball.body->position.y, GetMousePosition().x, GetMousePosition().y, GREEN);
+    if (ballTiedToCursor) { DrawLine(ball.body->position.x, ball.body->position.y, GetMousePosition().x, GetMousePosition().y, GREEN); }
     DrawFPS(20, 20);    // Top drawing
 }

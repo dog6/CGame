@@ -26,6 +26,16 @@ Color Tile::getColor() { return this->rect.getColor(); };
 void Tile::draw(Vector2 position) {
     rect.draw(this->position);
 };
+vector<Vector2> Tile::getVertices(Vector2 pos){
+    vector<Vector2> result;
+    // TL,TR,BR,BL, so they're inserted backwards
+    Vector2 sz = this->getSize();
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+    return result;
+}
 
 Vector2 Tile::getPosition() { return this->position; }
 void Tile::setPosition(Vector2 pos) {this->position = pos;}

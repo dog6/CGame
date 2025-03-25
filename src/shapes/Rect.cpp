@@ -33,6 +33,17 @@ void Rect::draw(Vector2 position) {
     DrawRectangleV(position, this->getSize(), this->getColor());
 };
 
+vector<Vector2> Rect::getVertices(Vector2 pos){
+    vector<Vector2> result;
+    // TL,TR,BR,BL, so they're inserted backwards
+    Vector2 sz = this->getSize();
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+    return result;
+  }
+
 Rectangle Rect::toRectangle(Vector2 position){
     Rectangle r = Rectangle();
     r.width = this->size.x;

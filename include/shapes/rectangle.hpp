@@ -24,8 +24,10 @@ class Rect: public IShape {
     
     Color getColor() override; // get color
     void draw(Vector2 position) override;
+    vector<Vector2> getVertices(Vector2 pos) override;
     
+
     Rectangle toRectangle(Vector2 position);
-    // float sizeToRadius();
+
 };
 #endif

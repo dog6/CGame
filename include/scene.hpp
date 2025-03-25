@@ -18,6 +18,7 @@ class Scene {
         void addEntity(Entity entity); 
         void addEntities(std::vector<Entity> entities); 
         void setGravity(Vector2 gravity);
+        Vector2 getGravity();
         int getEntityCount(); 
 };
 #endif

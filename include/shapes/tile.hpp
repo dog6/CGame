@@ -23,7 +23,8 @@ class Tile: public IShape {
     Color getColor() override; // get color
     
     void draw(Vector2 position) override; // draw tile to screen
-    
+    vector<Vector2> getVertices(Vector2 pos) override;
+
     // Tile only
     Rect rect;
     Vector2 getPosition(); // get position

@@ -22,7 +22,7 @@ class Entity {
         void update(float dt, Vector2 sceneGravity); // update method
         void handleCollision(vector<Entity> entities);
         string name;
-        EntityType entityType; // for collision
+        // EntityType entityType; // for collision
         bool collideWithCamera; // can the entity leave the screen?
         bool isEnabled; // is the entity active?
         bool hasCollider; // does the entity have collision?

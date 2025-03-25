@@ -14,6 +14,9 @@ class IShape {
         
         virtual void setSize(Vector2 size) = 0;
 
+        virtual vector<Vector2> getVertices(Vector2 pos) = 0;
+
+
         virtual void draw(Vector2 position) = 0; // draw shape to screen
         // virtual float sizeToRadius(); // converts width & height to radius (for equidistant ellipse & rectangle)
 };

@@ -13,11 +13,11 @@ Box::Box(IShape* shape){
   this->visible = shape->isVisible();
 }
 
-Box::Box(){
+/*Box::Box(){
   this->size = 10;
   this->color = WHITE;
   this->visible = false;
-}
+}*/
 
 Box::~Box(){} // destructor
 
@@ -30,7 +30,7 @@ void Box::setSize(Vector2 size) { this->size = Smallmath::sizeToRadius(size); };
 Color Box::getColor() { return this->color; };
 
 void Box::draw(Vector2 position) {
-  DrawPoly(position, 4, this->size, 45, this->color);
+  // DrawPoly(position, 4, this->size, 45, this->color);
 };
 
 Rectangle Box::toRectangle(Vector2 position){
@@ -41,4 +41,15 @@ Rectangle Box::toRectangle(Vector2 position){
   r.x = position.x;
   r.y = position.y;
   return r;
+}
+
+vector<Vector2> Box::getVertices(Vector2 pos){
+  vector<Vector2> result;
+  // TL,TR,BR,BL, so they're inserted backwards
+  Vector2 sz = this->getSize();
+  result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
+  result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
+  result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
+  result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+  return result;
 }

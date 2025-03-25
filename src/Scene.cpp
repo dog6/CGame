@@ -14,20 +14,16 @@ Scene::~Scene(){
     TraceLog(LOG_INFO, buffAsStdStr.c_str());
 }
 
-void Scene::setGravity(Vector2 grav){
-    this->gravity=grav;
-}
+void Scene::setGravity(Vector2 grav){ this->gravity=grav; }
+
+Vector2 Scene::getGravity(){ return this->gravity; }
 
 // adds entitiy to scene
-void Scene::addEntity(Entity e){
-    entitiesInScene.push_back(e);
-}
+void Scene::addEntity(Entity e){ entitiesInScene.push_back(e); }
 
 // adds multiple entites to scene
 void Scene::addEntities(vector<Entity> entities){
-    for (int i = 0; i < entities.size(); i++){
-        Scene::addEntity(entities[i]);
-    }
+    for (int i = 0; i < entities.size(); i++){ Scene::addEntity(entities[i]); }
 }
 
 // renders all entities in the scene
