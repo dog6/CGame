@@ -59,11 +59,11 @@ Tile* Tilemap::getTile(Vector2 pos){
     return nullptr;
 }
 
-void Tilemap::draw(Vector2 tilemapPos){
+void Tilemap::draw(Vector2 tilemapPos, float rot){
     if (this->visible){ // if whole tilemap is visible
         for (int i = 0; i < tileData.size(); i++){
             if (tileData[i].isVisible()){ // if individual tile is visible
-                tileData[i].draw(tilemapPos); // draw each tile
+                tileData[i].draw(tilemapPos, rot); // draw each tile
             }
         }
     }

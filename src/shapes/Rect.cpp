@@ -30,18 +30,26 @@ void Rect::setSize(Vector2 size) { this->size = size; };
 Color Rect::getColor() { return this->color; };
 void Rect::setColor(Color color) { this->color = color; };
 
-void Rect::draw(Vector2 position) {
-    DrawRectangleV(position, this->getSize(), this->getColor());
+void Rect::draw(Vector2 position, float rot) {
+    // DrawRectangleV(position, this->getSize(), this->getColor());
+    DrawRectanglePro(this->toRectangle(position), Vector2Zero(), rot, this->color);
 };
 
 vector<Vector2> Rect::getVertices(Vector2 pos){
     vector<Vector2> result;
     // TL,TR,BR,BL, so they're inserted backwards
-    Vector2 sz = this->getSize();
-    result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
+    // Vector2 sz = this->getSize();
+    /*result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
     result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
     result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
-    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL */
+
+    Rectangle r = this->toRectangle(pos);
+    result.push_back(Vector2{pos.x-(r.width), pos.y+(r.height)});
+    result.push_back(Vector2{pos.x+(r.width), pos.y+(r.height)});
+    result.push_back(Vector2{pos.x+(r.width), pos.y-(r.height)});
+    result.push_back(Vector2{pos.x-(r.width), pos.y-(r.height)});
+
     return result;
   }
 

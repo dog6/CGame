@@ -1,5 +1,5 @@
 #include "game.hpp"
-
+#include "smallmath.hpp"
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 class Rigidbody {

@@ -33,7 +33,7 @@ class Tilemap: public IShape {
     Color getColor() override;
     void setColor(Color color) override;
     void setSize(Vector2 size) override;
-    void draw(Vector2 position) override; // draws tilemap
+    void draw(Vector2 position, float rot) override; // draws tilemap
     vector<Vector2> getVertices(Vector2 pos) override;
 
 

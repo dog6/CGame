@@ -32,16 +32,16 @@ void Ellipse::setVisible(bool visible){ this->visible = visible; }
 vector<Vector2> Ellipse::getVertices(Vector2 pos){
     // TL,TR,BR,BL, so they're inserted backwards
     vector<Vector2> result;
+
     Vector2 sz = this->getSize();
-    result.push_back(Vector2{pos.x-sz.x, pos.x+sz.y}); // BL
-    result.push_back(Vector2{pos.x+sz.x, pos.x+sz.y}); // BR
-    result.push_back(Vector2{pos.x+sz.x, pos.x-sz.y}); // TR
-    result.push_back(Vector2{pos.x-sz.x, pos.x-sz.y}); // TL
+    result.push_back(Vector2{pos.x + sz.x, pos.y});            // Right
+    result.push_back(Vector2{pos.x, pos.y + sz.y});            // Top
+    result.push_back(Vector2{pos.x - sz.x, pos.y});            // Left
+    result.push_back(Vector2{pos.x, pos.y - sz.y});            // Bottom
     return result;
 }
 
-void Ellipse::draw(Vector2 position){ 
+void Ellipse::draw(Vector2 position, float rot){ 
     DrawEllipse(position.x, position.y, this->size.x, this->size.y, this->color);
-    // DrawPoly(position, 32, this->sizeToRadius(), )
  }
 

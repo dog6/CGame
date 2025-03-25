@@ -29,8 +29,8 @@ void Box::setSize(Vector2 size) { this->size = Smallmath::sizeToRadius(size); };
 
 Color Box::getColor() { return this->color; };
 
-void Box::draw(Vector2 position) {
-  // DrawPoly(position, 4, this->size, 45, this->color);
+void Box::draw(Vector2 position, float rot) {
+  DrawPoly(position, 4, this->size, rot+45, this->color);
 };
 
 Rectangle Box::toRectangle(Vector2 position){

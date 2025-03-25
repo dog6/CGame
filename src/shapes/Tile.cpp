@@ -24,8 +24,8 @@ void Tile::setSize(Vector2 size) { this->rect->setSize(size); };
 Color Tile::getColor() { return this->rect->getColor(); };
 void Tile::setColor(Color color) { this->rect->setColor(color); };
 
-void Tile::draw(Vector2 position) {
-    rect->draw(this->position);
+void Tile::draw(Vector2 position, float rot) {
+    rect->draw(this->position, rot);
 };
 vector<Vector2> Tile::getVertices(Vector2 pos){
     vector<Vector2> result;

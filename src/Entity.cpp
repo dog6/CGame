@@ -3,12 +3,13 @@
 #include "../include/shapes/rectangle.hpp"
 #include "../include/shapes/ellipse.hpp"
 
-Entity::Entity(string name, Vector2 position, bool enabled, bool hasCollider){
+Entity::Entity(string name, Vector2 position, float rot, bool enabled, bool hasCollider){
     TraceLog(LOG_INFO, string("Created entity named " + name).c_str());
     this->name = name;
     this->body = new Rigidbody(position);
     this->isEnabled = enabled;
     this->shape = nullptr;
+    this->rotation = rot;
     this->hasCollider = hasCollider;
 }
 
@@ -28,70 +29,70 @@ void Entity::update(float dt, Vector2 forces){
 
 }
 
-float bounceStrength = 0.8;
+float bounceStrength = 0.4;
 void Entity::collideWithCameraBorders() {
 
     if (collideWithCamera){
+        vector<Vector2> verts = this->shape->getVertices(this->body->position);
+        for (int v = 0; v < verts.size(); v++){
+
+            if (verts[v].x >= screenWidth){
+                body->position.x -= Vector2Distance(verts[v], Vector2{screenWidth, verts[v].y});
+                body->velocity.x *= -bounceStrength;
+            }
+            if (verts[v].x <= 0){
+                body->position.x += Vector2Distance(verts[v], Vector2{0, verts[v].y});
+                body->velocity.x *= -bounceStrength;
+            }
+
+            if (verts[v].y >= screenHeight){
+                body->position.y -= Vector2Distance(verts[v], Vector2{verts[v].x, screenHeight});
+                body->velocity.y *= -bounceStrength;
+            }
+            if (verts[v].y <= 0){
+                body->position.y += Vector2Distance(verts[v], Vector2{verts[v].x, 0});
+                body->velocity.y *= -bounceStrength;
+            }
+
+
+        }
+
+        /*
         // Left of camera
         if (body->position.x-(shape->getSize().x) <= 0){
             body->position.x = (shape->getSize().x);
-            body->velocity.x *= -0.5;
+            body->velocity.x *= -bounceStrength;
         }
 
         // Right of camera
         if (body->position.x+(shape->getSize().x) >= screenWidth){
             body->position.x = screenWidth-(shape->getSize().x);
-            body->velocity.x *= -0.5;
+            body->velocity.x *= -bounceStrength;
         }
 
         // Top of camera
         if (body->position.y-(shape->getSize().y) <= 0){
             body->position.y = (shape->getSize().y);
             body->velocity.y *= -bounceStrength;
+
         }
         // Bottom of camera
         if (body->position.y+(shape->getSize().y) >= screenHeight){
             body->position.y = screenHeight-(shape->getSize().y);
             body->velocity.y *= -bounceStrength;
         }
+        */
     }
 
 }
 
-/*
-void handleRectangleCollisions(Entity entA, Entity entB){
-    Rectangle rectA = Rect(entA.shape).toRectangle(entA.body->position);
-    Rectangle rectB = Rect(entB.shape).toRectangle(entB.body->position);
-
-    if (CheckCollisionRecs(rectA, rectB)){
-        // Collision
-        entA.body->velocity *= -1;
-        entB.body->velocity *= -1;
-    }
-}*/
-/*
-void handleCircleCollisions(Entity entA, Entity entB){
-
+void Entity::setRotation(float r){
+    this->rotation = r;
+    // Rotate(r);
 }
 
-// A = rect, B = circle
-void handleRectangleOnCircleCollisions(Entity entA, Entity entB){
-    Rectangle rectA = Rect(entA.shape).toRectangle(entA.body->position);
-    Ellipse ellB = Ellipse(entB.shape);
+float Entity::getRotation(){ return this->rotation; }
 
-    if (entB.shape->getSize().x == entB.shape->getSize().y){
-        // For true circles
-        if (CheckCollisionCircleRec(entB.body->position, entB.shape->getSize().x, rectA)){
-            // Collision
-            entA.body->velocity *= -1;
-            entB.body->velocity *= -1;
-        }
-    }else {
-        // For ovals
-    }
-
-
-}*/
 
 void Entity::handleCollision(vector<Entity> entities){
 
@@ -101,31 +102,15 @@ void Entity::handleCollision(vector<Entity> entities){
         if (&entities[i] == this|| entities[i].body == nullptr) {
             continue; // don't collide with self
         }
-        /*if (Vector2Distance(entities[i].body->position, this->body->position) > (entities[i].shape->getSize().x+this->shape->getSize().x+10)
-        && Vector2Distance(entities[i].body->position, this->body->position) > (entities[i].shape->getSize().y+this->shape->getSize().y+10)){
-            continue; // skip collision check if far apart
-        }*/
 
+        DrawLineV(entities[i].body->position, this->body->position, RED);
         // Handle collision (SAT)
+        // Draw ray
+        // colA = this->body->position;
+        // colB = entities[i].body->position;
+        // DrawLineV(entities[i].body->position, this->body->position, RED);
 
-        // Check each vertex
-      /*  vector<Vector2> vertsA = this->shape->getVertices(this->body->position);
-        vector<Vector2> vertsB = entities[i].shape->getVertices(entities[i].body->position);
-
-        bool aHasCollision = false;
-        if (vertsA.size() != vertsB.size()){
-            TraceLog(LOG_ERROR, string("Vertices not the same size for entities " + this->name + " and " + entities[i].name).c_str());
-            continue;
-        }
-
-        for (int a = 0; a < vertsA.size(); a++) {
-            // CheckCollisionLines(vertsA[a], ,)
-
-            // if (vertsA[a].x >= vertsB[a].x && ) {
-
-            // }
-        }
-*/
+   
     }
 
 }
@@ -133,8 +118,9 @@ void Entity::handleCollision(vector<Entity> entities){
 
 // draw entity shape
 void Entity::draw(){
+    // DrawLineV(colA, colB, RED); // draw line between entites being checked for collision
     if (shape != nullptr){
-        shape->draw(body->position);
+        shape->draw(body->position, this->rotation);
     }else {
         TraceLog(LOG_INFO, "Entity missing shape");
     }

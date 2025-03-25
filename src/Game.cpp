@@ -56,9 +56,11 @@ Tilemap* map;
 
 // Create entities           name, position
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
-// Entity cursorRectangle = Entity("cursor", Vector2{100,100});
+Entity cursorRectangle = Entity("cursor", Vector2{100,100});
+Entity rect = Entity("rect", Vector2{200, 45}, 0);
+
 Entity ball = Entity("ball", screenCenter);
-Entity box = Entity("box", Vector2{300, 225});
+// Entity box = Entity("box", Vector2{300, 225});
 /* Game start */
 void Game::start(){
 
@@ -75,28 +77,32 @@ void Game::start(){
     
     tilemap.shape = map; // give tilemap it's shape
 
-    
+    // Create rectangle
+    rect.shape = new Rect(Vector2{50,50}, BLUE);
+    rect.body->mass = 1;
+    rect.body->isKinematic = false;
+    rect.collideWithCamera = true;
+
     // Create ellipse
-    ball.shape = new Ellipse(12, BLACK); // give ball shape
+    ball.shape = new Ellipse(16, RED); // give ball shape
     ball.body->mass = 0.3; // 0.3 kg
     ball.body->isKinematic = false;
     ball.collideWithCamera = true;
     
     // Create cursor rectangle
-    // cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
+    cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
 
     // Create box (WIP)
     /*box.body->mass = 1; // 1 kg
     box.body->force = Vector2{1, 1};
     box.body->isKinematic = false;
-    box.collideWithCamera = true;
-    box.entityType = EntityType::Box;*/
+    box.collideWithCamera = true;*/
 
     // Set scene gravity
     // demoScene.setGravity(Vector2{0, 9.81});
 
     // Or add multiple entities at once instead
-    demoScene.addEntities(vector<Entity>{tilemap, ball, /*cursorRectangle*/  /*box <-- issue with box :/ */});
+    demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle, rect /*box <-- issue with box :/ */});
     
     // Set scene gravity
     demoScene.setGravity(Vector2{0, 9.81f});
@@ -109,7 +115,7 @@ void demoCode(){
 
     // Update cursor block
     mousePos = GetMousePosition();
-    // cursorRectangle.body->position = mousePos;
+    cursorRectangle.body->position = Vector2Subtract(mousePos, Smallmath::Vector2DivideValue(cursorRectangle.shape->getSize(), 2));
 
     // 'Tie' ball to cursor ( kinda bad, just for demo )
     if (ballTiedToCursor) {
@@ -143,7 +149,6 @@ void Game::update(){
     
     // Update scene
     demoScene.update(frame_dt); // physics
-
     demoCode(); // for demo
 
 }

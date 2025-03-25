@@ -18,3 +18,26 @@ float Smallmath::sizeToRadius(Vector2 v){
 float Smallmath::Vector2Product(Vector2 v){
   return v.x*v.y;
 }
+
+/* returns x*val, y*val <float>
+  `returns <float>, parameters <Vector2>, <float>`
+*/
+Vector2 Smallmath::Vector2ProductValue(Vector2 v, float val) {
+  return Vector2{v.x*val, v.y*val};
+}
+
+/* returns x/y <float>
+  `returns <float>, parameters <Vector2>`
+*/
+float Smallmath::Vector2Divide(Vector2 v){
+  return v.x/v.y;
+}
+
+
+/* returns x/val, y/val <float>
+  `returns <float>, parameters <Vector2>, <float>`
+*/
+Vector2 Smallmath::Vector2DivideValue(Vector2 v, float val){
+  return Vector2{v.x/val, v.y/val};
+}
+
