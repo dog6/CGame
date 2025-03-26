@@ -47,6 +47,15 @@ Vector2 Smallmath::Vector2Direction(Vector2 from, Vector2 to){
     return Vector2Normalize(Vector2Subtract(from, to));
 }
 
+float Smallmath::Vector2LargerValue(Vector2 v){
+  return max(v.x, v.y);
+}
+
+float Smallmath::Vector2SmallerValue(Vector2 v){
+  return min(v.x,v.y);
+}
+
+
 Vector2 Smallmath::IndexToTilemap(int index, int tilemap_width){
   
     Vector2 result;

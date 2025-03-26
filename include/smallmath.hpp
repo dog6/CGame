@@ -18,6 +18,9 @@ class Smallmath {
 
   static Vector2 Vector2Direction(Vector2 from, Vector2 to);
 
+  static float Vector2LargerValue(Vector2 v);
+  static float Vector2SmallerValue(Vector2 v);
+
   static Vector2 IndexToTilemap(int index, int tilemap_width);
   static int TilemapToIndex(Vector2 position, int tilemap_width);
 };

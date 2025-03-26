@@ -17,14 +17,19 @@ class Tilemap: public IShape {
     vector<Tile> tileData; // arr of tiles
     Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_gap = 0, bool visible = true);
     ~Tilemap();
-    void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
     void setTile(Vector2 pos, Tile tile); // set tile
-    void setTileData(Color color, bool visible); // sets all tiles 
+    void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
+    Vector2 getTileSize(); // resize tile to new size
     Tile* getTile(Vector2 pos); //gets hovered tile
     bool visible;
     float tileGap = 0;
-
-
+    void setTileSize(Vector2 s); // resize tile to new size
+    /*
+    void setAllTilesVisible(bool vis);
+    */
+   void refreshMap();
+    void setAllTilesColor(Color color); // sets all tiles
+    void setTileData(Color color, bool visible);
 
     /* IShape methods */
     void setVisible(bool isVisible) override;
@@ -36,7 +41,6 @@ class Tilemap: public IShape {
     void draw(Vector2 position, float rot) override; // draws tilemap
     vector<Vector2> getVertices(Vector2 pos) override;
     vector<Line> getLines(Vector2 pos) override;
-
 
 };
 #endif

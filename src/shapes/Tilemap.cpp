@@ -7,22 +7,10 @@ Tilemap::Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_g
     this->tileSize = tile_size;
     this->tileGap = tile_gap;
     this->visible = visible;
-    setTileData(BLACK, false);
+    setTileSize(tile_size);
 }
 
 Tilemap::~Tilemap(){ TraceLog(LOG_INFO, "Destructed tilemap"); }
-
-void Tilemap::setTileData(Color color, bool visible){
-    this->tileData = vector<Tile>{}; // reset tileData
-    for (int x = 0; x < size.x; x++){
-        for (int y = 0; y < size.y; y++){
-            int idx = y*size.x+x;
-            float tileX = this->position.x+x*(tileSize.x+tileGap);
-            float tileY = this->position.y+y*(tileSize.y+tileGap);
-            this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)), visible)); // init default white colored tile @ position
-        }
-    }
-}
 
 void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
    // not most performant option
@@ -38,11 +26,20 @@ void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
 }
 }
 
+
+
+Vector2 Tilemap::getTileSize(){
+    // resize all tiles
+    return this->tileData[0].getSize();
+}
+
+
 void Tilemap::setTile(Vector2 pos, Tile tile){
     // not most performant option
     for (int i = 0; i < tileData.size(); i++){
           // Check distance from tile to point
-          if (Vector2Distance(tileData[i].getPosition(), pos) > 10){
+          Vector2 tPos = tileData[i].getPosition();
+          if (Vector2Distance(Vector2{tPos.x-(this->size.x/2), tPos.y-(this->size.y/2)}, pos) > 10){
             continue;
         }
 
@@ -55,12 +52,11 @@ void Tilemap::setTile(Vector2 pos, Tile tile){
 Tile* Tilemap::getTile(Vector2 pos){
     for (int i = 0; i < tileData.size(); i++){
         // Check distance from tile to point
-        if (Vector2Distance(tileData[i].getPosition(), pos) > 10){
+        if (Vector2Distance(tileData[i].getPosition(), pos) > Smallmath::sizeToRadius(this->tileSize)){
             continue;
         }
 
         if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
-            // TraceLog(LOG_INFO, string("Skipped " + to_string(tC) + " tiles.").c_str());
             return &tileData[i];
         }
     }
@@ -94,7 +90,7 @@ vector<Vector2> Tilemap::getVertices(Vector2 pos){
   }
 // Does nothing for tilemap
 Color Tilemap::getColor() { return WHITE; };
-void Tilemap::setColor(Color color) { setTileData(color, true); };
+void Tilemap::setColor(Color color) { setAllTilesColor(color); };
 
 
 vector<Line> Tilemap::getLines(Vector2 pos){
@@ -105,4 +101,54 @@ vector<Line> Tilemap::getLines(Vector2 pos){
         result.push_back(*(new Line(points[i], points[i+1], RED)));
     }
     return result;
+}
+
+void Tilemap::setTileData(Color color, bool visible){
+    this->tileData = vector<Tile>{}; // reset tileData
+    for (int x = 0; x < size.x; x++){
+        for (int y = 0; y < size.y; y++){
+            int idx = y*size.x+x;
+            float tileX = this->position.x+x*(tileSize.x+tileGap);
+            float tileY = this->position.y+y*(tileSize.y+tileGap);
+            this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)), visible)); // init default white colored tile @ position
+        }
+    }
+}
+
+/*
+void Tilemap::setAllTilesVisible(bool vis){
+    for (int i = 0; i < tileData.size(); i++){
+        this->tileData[i].setVisible(vis);
+    }
+}
+
+void Tilemap::createMap(Color defaultColor, Vector2 sz){
+
+}
+*/
+
+
+void Tilemap::refreshMap(){
+    vector<Tile> newData = vector<Tile>{};
+    for (int x = 0; x < size.x; x++){
+        for (int y = 0; y < size.y; y++){
+            int idx = Smallmath::TilemapToIndex(Vector2{(float)x,(float)y}, size.x);
+            float tileX = this->position.x+x*(tileSize.x+tileGap);
+            float tileY = this->position.y+y*(tileSize.y+tileGap);
+            newData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, this->tileData[idx].getColor())), this->tileData[idx].isVisible())); // init default white colored tile @ position
+        }
+    }
+    this->tileData = newData;
+}
+
+void Tilemap::setTileSize(Vector2 s){
+    for (int i = 0; i < tileData.size(); i++){
+       tileData[i].setSize(s);
+   }
+}
+
+void Tilemap::setAllTilesColor(Color color){
+        for (int i = 0; i < tileData.size(); i++){   
+            this->tileData[i].setColor(color);
+        }
 }

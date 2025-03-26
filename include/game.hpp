@@ -13,11 +13,13 @@
 // Raylib includes------------------------
 #include "../lib/raylib/raylib.h"
 #include "../lib/raylib/raymath.h"
+#include "../lib/raylib/rlgl.h"
 // ---------------------------------------
 #include <string>
 #include <vector>
 // #include <math.h> breaks stuff (Vector2 from raylib)
 #include "smallmath.hpp"
+
 
 
 // Definitions----------------------------
