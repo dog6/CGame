@@ -48,6 +48,7 @@ Vector2 Smallmath::Vector2Direction(Vector2 from, Vector2 to){
 }
 
 Vector2 Smallmath::IndexToTilemap(int index, int tilemap_width){
+  
     Vector2 result;
     result.x = index % tilemap_width;
     result.y = index / tilemap_width;

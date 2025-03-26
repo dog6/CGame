@@ -19,7 +19,7 @@ class Tilemap: public IShape {
     ~Tilemap();
     void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
     void setTile(Vector2 pos, Tile tile); // set tile
-    void setTileData(Color color); // sets all tiles 
+    void setTileData(Color color, bool visible); // sets all tiles 
     Tile* getTile(Vector2 pos); //gets hovered tile
     bool visible;
     float tileGap = 0;

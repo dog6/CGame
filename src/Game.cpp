@@ -59,21 +59,25 @@ Tilemap* map;
 // Create entities
 Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
 
-bool isSimRunning = false;
+int generations = 0;
 
 /* Game start */
 void Game::start(){
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, screenTitle);
-    SetTargetFPS(60);
+    SetTargetFPS(60); // 10 for conway
 
     // Create tilemap
-    float tileSize = 10;
+    float tileSize = 12;
     float tileGap = 0;
-    map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize+tileGap),screenHeight/(tileSize+tileGap)}, Vector2{tileSize,tileSize}, tileGap); 
+    // map = new Tilemap(Vector2Zero(), Vector2{screenWidth/(tileSize),screenHeight/(tileSize)}, Vector2{tileSize,tileSize}, tileGap); 
+    // map = new Tilemap(Vector2Zero(), Vector2{screenWidth, screenHeight}, Vector2{tileSize, tileSize}, tileGap);
+    // map = new Tilemap(Vector2Zero(), Vector2{30,30}, Vector2{tileSize,tileSize}, tileGap); 
+    map = new Tilemap(Vector2Zero(), Vector2{50, 50}, Vector2{tileSize, tileSize}, tileGap);
+    
+    map->setTileData(WHITE, false);
     tilemap.shape = map; // give tilemap it's shape
-    tilemap.shape->setColor(BLACK);
 
     // Set scene gravity
     // demoScene.setGravity(Vector2{0, 9.81});
@@ -96,83 +100,54 @@ bool NeighborAlive(Vector2 pos, Vector2 offset){
 }
 
 int CountNeighbors(Vector2 pos){
- // Get X & Y
- int livingNeighbors = 0;
- // Count neighbors
-     // top left corner
-     if (pos.x > 0 && pos.y > 0 && NeighborAlive(pos, Vector2Add(VECTOR2_UP, VECTOR2_LEFT))){
-        livingNeighbors++;
-     }
+    int livingNeighbors = 0;
+    // Count neighbors
+    vector<Vector2> offsets = vector<Vector2>{Vector2{-1, -1}, Vector2{0, -1}, Vector2{1, -1},
+                                              Vector2{-1, 0},                 Vector2{1, 0},
+                                              Vector2{-1, 1}, Vector2{0, 1}, Vector2{1, 1}};
 
-     // top
-     if (pos.y > 0 && NeighborAlive(pos, VECTOR2_UP)){
-        livingNeighbors++;
-     }
-
-     // top right
-     if (pos.x < map->getSize().x && pos.y > 0 && NeighborAlive(pos, Vector2Add(VECTOR2_UP, VECTOR2_RIGHT))){
-        livingNeighbors++;
-     }
-
-     // right neighbor
-     if (pos.x < map->getSize().x && NeighborAlive(pos, VECTOR2_RIGHT)){
-        livingNeighbors++;
-     }
-
-     // left neighbor
-     if (pos.x > 0 && NeighborAlive(pos, VECTOR2_LEFT)){
-        livingNeighbors++;
-     }
-
-     // bottom neighbor
-     if (pos.y < map->getSize().y && NeighborAlive(pos, VECTOR2_DOWN)){
-        livingNeighbors++;
-     }
-
-     // bottom right neighbor
-     if (pos.y < map->getSize().y && pos.x < map->getSize().x && NeighborAlive(pos, Vector2Add(VECTOR2_DOWN, VECTOR2_RIGHT))){
-        livingNeighbors++;
-     }
-
-     // bottom left
-     if (pos.y < map->getSize().y && pos.x > 0 && NeighborAlive(pos, Vector2Add(VECTOR2_DOWN, VECTOR2_LEFT))){
-        livingNeighbors++;
-     }
+        for (int i = 0; i < offsets.size(); i++){
+            if (pos.x > 0 && pos.y > 0 && pos.x < map->getSize().x-1 && pos.y < map->getSize().y-1){
+                if (NeighborAlive(pos, offsets[i])){
+                    livingNeighbors++;
+                }
+            }
+        }
     return livingNeighbors;
 }
 
 void ConwayGameOfLife(){
-    if (!isSimRunning){
-        return;
-    }
+
+    vector<Tile> newTileData = map->tileData;
+
     // look through each tile, find alive neighbors
-    for (int i = 0; i < map->tileData.size(); i++){
+    for (int i = 0; i < newTileData.size(); i++){
+
        Vector2 pos = Smallmath::IndexToTilemap(i, map->getSize().x);
+
+       if (pos.x == 0 || pos.y == 0){
+        continue;
+       }
+
        int livingNeighbors = CountNeighbors(pos);
 
-       if (map->tileData[i].isVisible()){
+       if (newTileData[i].isVisible()){
             // this tile is 'alive'
-            if (livingNeighbors == 2 || livingNeighbors == 3){
-                map->tileData[i].setVisible(false); // kill this tile due to over population
-                continue;
+            if (livingNeighbors > 3){
+                newTileData[i].setVisible(false); // kill this tile due to over population
+            }else if (livingNeighbors < 2){
+                newTileData[i].setVisible(false); // kill this tile due to under population
             }
-
-            if (livingNeighbors < 2){
-                map->tileData[i].setVisible(false); // kill this tile due to under population
-                continue;
-            }
-
-
         }else {
             // this tile is 'dead'
             if (livingNeighbors == 3) {
-                map->tileData[i].setVisible(true); // repopulate this tile
-                continue;
+                newTileData[i].setVisible(true); // repopulate this tile
             }
         }
-        // anyone with exactly 2 or 3 neighbors lives
     }
-    WaitTime(0.25);
+
+    map->tileData = newTileData;
+    WaitTime(0.1);
 }
 
 void demoCode(){
@@ -184,17 +159,17 @@ void demoCode(){
     if (hoveredTile != nullptr){
         // Change tile color
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            hoveredTile->setVisible(true);
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
             hoveredTile->setVisible(false);
         }
     }
 
-    if (GetKeyPressed() == KEY_SPACE){
-        // toggle sim running
-        isSimRunning = !isSimRunning;
+    if (IsKeyDown(KEY_SPACE)){
+        generations++;
+        ConwayGameOfLife(); 
     }
-
-    ConwayGameOfLife(); 
-
 }
 // ----------------------------
 
@@ -208,8 +183,8 @@ void Game::update(){
 
 /* Draw loop */
 void Game::draw(){
-    ClearBackground(WHITE); // Bottom drawing
+    ClearBackground(BLACK); // Bottom drawing
     demoScene.render();
-    DrawText(string("Sim Running?: " + to_string(isSimRunning)).c_str(), 13, screenHeight-26, 24, DARKGREEN);
+    DrawText(string("Generations: " + to_string(generations)).c_str(), 13, screenHeight-26, 24, GREEN);
     DrawFPS(20, 20);    // Top drawing
 }
