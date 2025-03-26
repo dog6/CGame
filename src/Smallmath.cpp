@@ -14,30 +14,46 @@ float Smallmath::sizeToRadius(Vector2 v){
 }
 
 /* returns x*y <float>
-  `returns <float>, parameters <Vector2>` */
+  parameters `<Vector2>`` */
 float Smallmath::Vector2Product(Vector2 v){
   return v.x*v.y;
 }
 
 /* returns x*val, y*val <float>
-  `returns <float>, parameters <Vector2>, <float>`
+  parameters <Vector2>, <float>`
 */
 Vector2 Smallmath::Vector2ProductValue(Vector2 v, float val) {
   return Vector2{v.x*val, v.y*val};
 }
 
-/* returns x/y <float>
-  `returns <float>, parameters <Vector2>`
+/* returns x/y `<float>`
+  parameters `<Vector2>`
 */
 float Smallmath::Vector2Divide(Vector2 v){
   return v.x/v.y;
 }
 
 
-/* returns x/val, y/val <float>
-  `returns <float>, parameters <Vector2>, <float>`
+/* returns x/val, y/val `<float>`
+  parameters `<Vector2>`, `<float>`
 */
 Vector2 Smallmath::Vector2DivideValue(Vector2 v, float val){
   return Vector2{v.x/val, v.y/val};
 }
 
+/* returns `<Vector2> direction`
+  parameters `<Vector2>`, `<Vector2>`*/
+Vector2 Smallmath::Vector2Direction(Vector2 from, Vector2 to){
+    return Vector2Normalize(Vector2Subtract(from, to));
+}
+
+Vector2 Smallmath::IndexToTilemap(int index, int tilemap_width){
+    Vector2 result;
+    result.x = index % tilemap_width;
+    result.y = index / tilemap_width;
+    return result;
+}
+
+int Smallmath::TilemapToIndex(Vector2 position, int tilemap_width){
+  return (int)(position.y*tilemap_width+position.x);
+}

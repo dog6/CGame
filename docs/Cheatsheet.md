@@ -27,7 +27,6 @@
 
   __properties__
   - <string> name             // name of entity (for logging)
-  - <EntityType> entityType   // type of entity (unused atm)**
   - <Rigidbody*> body         // pointer to rigidbody
   - <IShape*> shape           // pointer to shape
   # IShape (Interface)
@@ -39,7 +38,6 @@
   - <void> setSize(Vector2 size)    // set size of shape
   - <Vector2> getSize()             // get size of shape
   - <Color> getColor()              // get color of shape
-  - <float> sizeToRadius()          // convert `<vector2> size` to `<float> radius`**
   # Rigidbody (Non-static class)
   
   __methods__

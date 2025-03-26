@@ -1,16 +1,10 @@
 #include "game.hpp"
 #include "shapes/shape.hpp"
 #include "rigidbody.hpp"
-#include "entity_type.hpp"
 
 #ifndef ENTITY_H
 #define ENTITY_H
-/*
-enum EntityType{
-    Ellipse,
-    Rectangle,
-};
-*/
+
 class Entity {
     private: 
     void collideWithCameraBorders();
@@ -21,13 +15,14 @@ class Entity {
         ~Entity();
         void draw();    // draw method
         void update(float dt, Vector2 sceneGravity); // update method
-        void handleCollision(vector<Entity> entities);
+        void handleCollision(vector<Entity*> entities);
         void setRotation(float rot);
         float getRotation();
         string name;
-        bool collideWithCamera; // can the entity leave the screen?
+        bool doesCollideWithWindow; // can the entity collide with the window?
         bool isEnabled; // is the entity active?
         bool hasCollider; // does the entity have collision?
+        bool isColliding; // is the entity currently colliding with at least one thing?
         Rigidbody* body;
         IShape* shape; // *ptr to shape interface
 };

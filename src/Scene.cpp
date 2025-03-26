@@ -19,25 +19,26 @@ void Scene::setGravity(Vector2 grav){ this->gravity=grav; }
 Vector2 Scene::getGravity(){ return this->gravity; }
 
 // adds entitiy to scene
-void Scene::addEntity(Entity e){ entitiesInScene.push_back(e); }
+void Scene::addEntity(Entity* e){ entitiesInScene.push_back(e); }
 
 // adds multiple entites to scene
-void Scene::addEntities(vector<Entity> entities){
+void Scene::addEntities(vector<Entity*> entities){
     for (int i = 0; i < entities.size(); i++){ Scene::addEntity(entities[i]); }
 }
 
 // renders all entities in the scene
 void Scene::render(){
     for (int i = 0; i < entitiesInScene.size(); i++){
-        if (entitiesInScene[i].isEnabled){
-            entitiesInScene[i].draw(); // draw screen
+        if (entitiesInScene[i]->isEnabled){
+            entitiesInScene[i]->draw(); // draw screen
         }
     }
 }
 
 void Scene::update(float dt){
     for (int i = 0; i < entitiesInScene.size(); i++){
-        entitiesInScene[i].update(dt, this->gravity); // update all game logic
+        entitiesInScene[i]->update(dt, this->gravity); // update all game logic
+        // entitiesInScene[i]->handleCollision(entitiesInScene); WIP
     }
 }
 

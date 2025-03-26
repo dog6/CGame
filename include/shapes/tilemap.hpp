@@ -10,11 +10,11 @@ class Tilemap: public IShape {
     Vector2 position; // position of tilemap
     Vector2 size; // width & height
     Vector2 tileSize; // width & height of individual tiles
-    vector<Tile> tileData; // arr of tiles
     vector<bool> tileVisible; // arr of bools, true if a tile is visible
-
-
+    
+    
     public: 
+    vector<Tile> tileData; // arr of tiles
     Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_gap = 0, bool visible = true);
     ~Tilemap();
     void setTileVisible(Vector2 pos, bool isVisible = true); // set tile @ position 
@@ -35,6 +35,7 @@ class Tilemap: public IShape {
     void setSize(Vector2 size) override;
     void draw(Vector2 position, float rot) override; // draws tilemap
     vector<Vector2> getVertices(Vector2 pos) override;
+    vector<Line> getLines(Vector2 pos) override;
 
 
 };

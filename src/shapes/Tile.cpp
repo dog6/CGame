@@ -51,14 +51,14 @@ Rectangle Tile::toRectangle(Vector2 pos) {
 Vector2 Tile::getPosition() { return this->position; }
 void Tile::setPosition(Vector2 pos) {this->position = pos;}
 
-/*
+
 vector<Line> Tile::getLines(Vector2 pos){
     vector<Line> result;
     vector<Vector2> points = this->getVertices(pos);
     // for each point, make a line
     for (int i = 0; i <= points.size(); i += 2){
-        result.push_back(new Line(points[i], points[i+1], RED));
+        result.push_back(*(new Line(points[i], points[i+1], RED)));
     }
     return result;
 }
-    */
+    

@@ -33,7 +33,6 @@ Color Rect::getColor() { return this->color; };
 void Rect::setColor(Color color) { this->color = color; };
 
 void Rect::draw(Vector2 position, float rot) {
-    // DrawRectangleV(position, this->getSize(), this->getColor());
     DrawRectanglePro(this->toRectangle(position), Vector2Zero(), rot, this->color);
 };
 
@@ -55,13 +54,13 @@ Rectangle Rect::toRectangle(Vector2 position){
     r.y = position.y;
     return r;
 }
-/*
+
 vector<Line> Rect::getLines(Vector2 pos){
     vector<Line> result;
     vector<Vector2> points = this->getVertices(pos);
     // for each point, make a line
     for (int i = 0; i <= points.size(); i += 2){
-        result.push_back(new Line(points[i], points[i+1], RED));
+        result.push_back(*(new Line(points[i], points[i+1], RED)));
     }
     return result;
-}*/
+}
