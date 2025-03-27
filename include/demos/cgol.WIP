@@ -1,0 +1,28 @@
+
+#ifndef CGOL_HPP
+#define CGOL_HPP
+
+#include "../../include/game.hpp"
+#include "../../include/shapes/tilemap.hpp"
+
+// somehow get all the code for CGOL in here
+
+class ConwayGameOfLife{
+
+    public:
+    Camera2D cam;
+    Vector2 mousePos;
+    
+    void handleCameraTranslate();
+    void handleCameraZoom(Vector2 mousePos);
+    void handleInput(Tilemap* map, int* generations);
+    bool NeighborAlive(Vector2 pos, Vector2 offset, Tilemap* map);
+    bool NotMovingTowards(Vector2 checkingDir, Vector2 possibleDir);
+    template<typename... Args>
+    bool NotMovingTowards(Vector2 checkingDir, Args... possibleDirs);
+    int CountNeighbors(Vector2 pos, Tilemap* map);
+    int IsEdgePixel(Vector2 pos, Vector2 sz);
+    void update(Tilemap* map, float tilemapSize, float dt, Vector2);
+}
+
+#endif

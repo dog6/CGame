@@ -62,9 +62,9 @@ Entity tilemap = Entity("first tilemap", Vector2{50,50}, true);
 
 int generations = 0;
 
-float tileSize = 12;
+float tileSize = 6;
 float tileGap = 1;
-float tilemapSize;
+float tilemapSize;// = 24;
 /* Game start */
 void Game::start(){
 
@@ -73,27 +73,22 @@ void Game::start(){
     SetTargetFPS(60); // 10 for conway
 
     // Create tilemap
-    tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize))+1, (screenHeight/(tileSize))+1});
+    tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize+tileGap)), (screenHeight/(tileSize+tileGap))});
     map = new Tilemap(Vector2Zero(), Vector2{tilemapSize, tilemapSize}, Vector2{tileSize, tileSize}, tileGap);
     map->setTileData(WHITE, false);
-    // map->setAllTilesColor(WHITE);   // all tiles are white by default
-    // map->setAllTilesVisible(false); // all tiles not visible by default
+    map->hasOutline = true;
+    map->outlineColor = WHITE;
+
     tilemap.shape = map; // give tilemap it's shape
-
-    // Set scene gravity
-    // demoScene.setGravity(Vector2{0, 9.81});
-
+    
     // Or add multiple entities at once instead
     demoScene.addEntities(vector<Entity*>{&tilemap});
     
-    // Set scene gravity
-    demoScene.setGravity(Vector2{0, 9.81f});
-
     // Create camera2D
-    cam.target = Vector2{0,0};
+    cam.target=map->position;//Vector2{-(tilemapSize/2),};
     cam.offset = Vector2{0,0};
     cam.rotation = 0.0f;
-    cam.zoom = 1.0f;
+    cam.zoom = 0.5f;
 
 }
 
@@ -101,61 +96,131 @@ void Game::start(){
 
 
 // Demo------------------------
-
 bool NeighborAlive(Vector2 pos, Vector2 offset){
-    return map->tileData[Smallmath::TilemapToIndex(Vector2{pos.x+offset.x, pos.y+offset.y}, map->getSize().x)].isVisible();
+    bool result = false;
+    try {
+        result = map->tileData[Smallmath::TilemapToIndex(Vector2{pos.x+offset.x, pos.y+offset.y}, map->getSize().x)].isVisible();
+    } catch (exception e){
+        TraceLog(LOG_INFO, "Failed to check neighbor", e.what());
+    }
+    return result;
+}
+
+/* returns pixel location as integer value
+    0 - center
+    1 - top edge 'north'
+    2 - top right corner 'north-east'
+    3 - right edge 'east'
+    4 - bottom right corner 'south-east'
+    5 - bottom edge 'south'
+    6 - bottom left corner 'south-west'
+    7 - left edge 'west'
+    8 - top left corner 'north-west'
+    parameters `<Vector2>` position, '<Vector2>' tilemap size
+*/
+int IsEdgePixel(Vector2 pos, Vector2 sz){
+    if (pos.x > 0 && pos.y > 0 && pos.x < sz.y && pos.y < sz.x){
+        return 0; // center
+    }else if (pos.x > 0  && pos.x < sz.x && pos.y == 0) {
+        return 1; // top edge 'north'
+    }else if (pos.x == sz.x && pos.y == 0){
+        return 2; // top right corner 'north-east'
+    }else if (pos.x == sz.x && pos.y < sz.y && pos.y > 0){
+        return 3; // right edge 'east'
+    }else if (pos.x == sz.x && pos.y == sz.y) {
+        return 4; // bottom right corner 'south-east'
+    }else if (pos.x > 0  && pos.x < sz.x && pos.y == sz.y) {
+        return 5; // bottom edge 'south'
+    }else if (pos.x == 0 && pos.y == sz.y){
+        return 6; // bottom left corner 'south-west'
+    }else if (pos.x == 0 && pos.y < sz.y && pos.y > 0){
+        return 7; // left edge 'west'
+    }else if (pos.x == 0 && pos.y == 0){
+        return 8; // top left corner 'north-west'
+    }
+    return -1;
+}
+
+bool NotMovingTowards(Vector2 checkingDir, Vector2 possibleDir) {
+    return (checkingDir.x != possibleDir.x || checkingDir.y != possibleDir.y);
+}
+
+template<typename... Args>
+bool NotMovingTowards(Vector2 checkingDir, Args... possibleDirs) {
+    return (... && NotMovingTowards(checkingDir, possibleDirs));
 }
 
 int CountNeighbors(Vector2 pos){
     int livingNeighbors = 0;
-    // Count neighbors
-    vector<Vector2> offsets = vector<Vector2>{Vector2{-1, -1}, Vector2{0, -1}, Vector2{1, -1},
-                                              Vector2{-1, 0},                 Vector2{1, 0},
-                                              Vector2{-1, 1}, Vector2{0, 1}, Vector2{1, 1}};
 
-        for (int i = 0; i < offsets.size(); i++){
-            if (pos.x > 0 && pos.y > 0 && pos.x < map->getSize().x-1 && pos.y < map->getSize().y-1){
+    std::array<Vector2, 8> offsets{ Vector2{-1, -1}, Vector2{0, -1}, Vector2{1, -1},
+                                    Vector2{-1, 0},                  Vector2{1, 0},
+                                    Vector2{-1, 1}, Vector2{0, 1},   Vector2{1, 1} };
+        
+    Vector2 v = Vector2SubtractValue(map->getSize(), 1);                                
+    int pixelType = IsEdgePixel(pos, v);            
+    for (int i = 0; i < offsets.size(); i++){
+        switch(pixelType){
+            case 0: // center
                 if (NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
                 }
-            }
-            else if (pos.x == 0 && pos.y < map->getSize().y-1 && pos.y > 0 && offsets[i] != Vector2{-1,0} && offsets[i] != Vector2{-1, 1 }&& offsets[i] != Vector2{-1, -1}){
-                // on left edge
-                if (NeighborAlive(pos, offsets[i])){
+            break; 
+            case 1: // north
+                if (NotMovingTowards(offsets[i], NORTH, NORTH_EAST, NORTH_WEST) && NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
                 }
-            }else if (pos.x < map->getSize().x-1 && pos.y < map->getSize().y-1 && pos.y > 0 && offsets[i] != Vector2{1,0} && offsets[i] != Vector2{1,1} && offsets[i] != Vector2{1,-1}){
-                // on right edge
-                if (NeighborAlive(pos, offsets[i])){
+            break;
+            case 2: // north-east
+                if (NotMovingTowards(offsets[i], NORTH, NORTH_EAST, NORTH_WEST, EAST, SOUTH_EAST) && NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
                 }
-            }else if (pos.x > 0  && pos.x < map->getSize().x-1 && pos.y == 0 && offsets[i] != Vector2{0,-1} && offsets[i] != Vector2{-1,-1} && offsets[i] != Vector2{1,-1}){
-                // on top edge
-                if (NeighborAlive(pos, offsets[i])){
+            break;
+            case 3: // east
+                if (NotMovingTowards(offsets[i], EAST, NORTH_EAST, SOUTH_EAST) && NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
                 }
-            }else if (pos.x > 0  && pos.x < map->getSize().x-1 && pos.y == map->getSize().y-1 && offsets[i] != Vector2{0,1} && offsets[i] != Vector2{1, 1} && offsets[i] != Vector2{-1, 1}){
-                // on bottom edge
-                if (NeighborAlive(pos, offsets[i])){
+            break;
+            case 4: // south-east
+                if (NotMovingTowards(offsets[i], SOUTH, SOUTH_EAST, SOUTH_WEST, EAST, NORTH_EAST) && NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
                 }
-            }
+            break;
+            case 5: // south
+                if (NotMovingTowards(offsets[i], SOUTH, SOUTH_EAST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
+                    livingNeighbors++;
+                }
+            break;
+            case 6: // south-west
+                if (NotMovingTowards(offsets[i], SOUTH_WEST, SOUTH_EAST, SOUTH, WEST, NORTH_WEST) && NeighborAlive(pos, offsets[i])){
+                    livingNeighbors++;
+                }
+            break;
+            case 7: // west
+                if (NotMovingTowards(offsets[i], WEST, NORTH_WEST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
+                    livingNeighbors++;
+                }
+            break;
+            case 8: // north-west
+                if (NotMovingTowards(offsets[i], NORTH, WEST, NORTH_WEST, NORTH_EAST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
+                    livingNeighbors++;
+                }
+            break;
+            default:
+            break;
         }
+    }
     return livingNeighbors;
 }
 
-void ConwayGameOfLife(){
-
-    vector<Tile> newTileData = map->tileData;
+void ConwayGameOfLife(float dt){
+    vector<Tile> newTileData = map->tileData; // make copy of tileData
+    Vector2 mapSize = map->getSize();
 
     // look through each tile, find alive neighbors
-    for (int i = 0; i < newTileData.size(); i++){
+    for (int i = 0; i < tilemapSize*tilemapSize; i++){
 
-       Vector2 pos = Smallmath::IndexToTilemap(i, map->getSize().x);
-
-       if (pos.x == 0 || pos.y == 0){
-        continue;
-       }
+       Vector2 pos = Smallmath::IndexToTilemap(i, mapSize.x);
 
        int livingNeighbors = CountNeighbors(pos);
 
@@ -174,8 +239,12 @@ void ConwayGameOfLife(){
         }
     }
 
-    map->tileData = newTileData;
-    WaitTime(0.1);
+
+    float timeElapsed = 0;
+    float delayInSeconds = 0.25f; // 250ms
+    map->tileData = newTileData; // set new tile
+
+
 }
 
 void handleCameraZoom(){
@@ -205,7 +274,6 @@ void demoCode(){
     // Update cursor block
     mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
 
-
     // Left click to place tile, right click to delete
     Tile* hoveredTile = map->getTile(mousePos);
     if (hoveredTile != nullptr){
@@ -221,7 +289,7 @@ void demoCode(){
     // Hold to increase generation
     if (IsKeyDown(KEY_SPACE)){
         generations++;
-        ConwayGameOfLife(); 
+        ConwayGameOfLife(frame_dt); 
     }
 
     // Reset tilemap
@@ -229,7 +297,6 @@ void demoCode(){
         TraceLog(LOG_INFO, "Reset tilemap");
         map->setTileData(WHITE, false);
     }
-
 
     handleCameraTranslate();
     handleCameraZoom();

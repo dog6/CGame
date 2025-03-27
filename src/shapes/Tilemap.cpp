@@ -7,6 +7,7 @@ Tilemap::Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_g
     this->tileSize = tile_size;
     this->tileGap = tile_gap;
     this->visible = visible;
+    this->outlineColor = WHITE;
     setTileSize(tile_size);
 }
 
@@ -52,7 +53,7 @@ void Tilemap::setTile(Vector2 pos, Tile tile){
 Tile* Tilemap::getTile(Vector2 pos){
     for (int i = 0; i < tileData.size(); i++){
         // Check distance from tile to point
-        if (Vector2Distance(tileData[i].getPosition(), pos) > Smallmath::sizeToRadius(this->tileSize)){
+         if (Vector2Distance(tileData[i].getPosition(), pos) > Smallmath::sizeToRadius(tileSize*2)){
             continue;
         }
 
@@ -70,7 +71,12 @@ void Tilemap::draw(Vector2 tilemapPos, float rot){
                 tileData[i].draw(tilemapPos, rot); // draw each tile
             }
         }
+
+        if (this->hasOutline){
+            DrawRectangleLines(this->position.x-this->tileGap, this->position.y-this->tileGap, ((this->tileSize.x+this->tileGap)*this->size.x)+(tileSize.x/2)+this->tileGap, ((this->tileSize.y+this->tileGap)*this->size.y)+(tileSize.y/2)+this->tileGap, this->outlineColor);
+        }
     }
+
 }
 
 void Tilemap::setSize(Vector2 size){ this->size = size; }
@@ -114,7 +120,6 @@ void Tilemap::setTileData(Color color, bool visible){
         }
     }
 }
-
 /*
 void Tilemap::setAllTilesVisible(bool vis){
     for (int i = 0; i < tileData.size(); i++){
