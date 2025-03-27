@@ -6,6 +6,7 @@
 #include "../../include/shapes/tilemap.hpp"
 #include "../../include/level.hpp"
 
+
 // somehow get all the code for CGOL in here
 
 class ConwayGameOfLife: public ILevel{

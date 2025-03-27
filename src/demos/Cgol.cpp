@@ -1,8 +1,24 @@
 #include "../../include/demos/cgol.hpp"
+#include "../../lib/raygui/raygui.h"
 
-float generationDelay = 0.1f; // delay in seconds between generations
+#define GUI_CGOL_UI_IMPLEMENTATION
+#include "../../include/ui/gui_cgol_ui.h"
+
+const char* guiStylePath = "../../assets/ui/styles/style_dark.rgs";
 bool changingGeneration = false;
 float generationTimer; // tracking delay
+
+GuiCgolUiState coglstate;
+/*
+typedef struct {
+    float genDelay = 0.1f; // delay in seconds between generations
+    int tileSize;
+    Color tileColor;
+} GameState;
+
+GameState gameState;*/
+
+GuiCgolUiState gameState;
 
 bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     bool result = false;
@@ -277,7 +293,11 @@ void ConwayGameOfLife::load(){
 
 void ConwayGameOfLife::start(){
     TraceLog(LOG_INFO, "Starting CGOL..");
-   
+
+    gameState = InitGuiCgolUi(); // init gui
+    // state.gen_delay_txtboxValue = delayBetweenGenerations;
+    // state.tile_sz_txtboxValue = this->tileSize;
+    // state.gen_delay_txtboxValue = this->delayBetweenGenerations;
 
     map->setTileData(WHITE, false);
     map->hasOutline = true;
@@ -295,6 +315,7 @@ void ConwayGameOfLife::update(){
     handleInput();
 }
 
+bool showMessageBox = false;
 void ConwayGameOfLife::render(){
 
     rlPushMatrix();
@@ -309,6 +330,19 @@ void ConwayGameOfLife::render(){
     this->scene->render();
     EndMode2D();
 
+    GuiCgolUi(&gameState);
+    map->setColor(gameState.tile_colorPickerValue);
+    map->setTileSize(Vector2{(float)gameState.tileSize_txtboxValue, (float)gameState.tileSize_txtboxValue});
+    this->delayBetweenGenerations = gameState.genDelay_txtboxValue;
+
+ 
+    try {
+        GuiLoadStyle(guiStylePath);
+    }catch (exception e){
+        TraceLog(LOG_ERROR, "Failed to find GUI style '%s'", guiStylePath);
+        return;
+    }
+  
     DrawFPS(20, 20);    // Top drawing
     DrawText(string("Generations: " + to_string(generations)).c_str(), 13, screenHeight-26, 24, GREEN);
     DrawText(string("Zoom: " + to_string(Normalize(cam.zoom, 0, 1))).c_str(), 13, screenHeight-48, 24, GREEN);

@@ -42,12 +42,16 @@
 
 // # Game Definitions----------------------------
 /* These are mainly here as an example  *
-    *  and should eventually be moved to *
-    *  a more suitable location          */
+*  and should eventually be moved to *
+*  a more suitable location          */
 #define GAME_TITLE "CGame v0.0.2"
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 450
 // ---------------------------------------
+
+#ifndef RAYGUI_IMPLEMENTATION
+    #define RAYGUI_IMPLEMENTATION       // must come before #include 'raygui.h' 
+#endif
 
 using namespace std;
 
