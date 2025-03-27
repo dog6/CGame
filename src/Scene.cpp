@@ -24,6 +24,7 @@ void Scene::addEntity(Entity* e){ entitiesInScene.push_back(e); }
 // adds multiple entites to scene
 void Scene::addEntities(vector<Entity*> entities){
     for (int i = 0; i < entities.size(); i++){ Scene::addEntity(entities[i]); }
+    // delete &entities;
 }
 
 // renders all entities in the scene

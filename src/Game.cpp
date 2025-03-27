@@ -64,7 +64,11 @@ int generations = 0;
 
 float tileSize = 6;
 float tileGap = 1;
-float tilemapSize;// = 24;
+float tilemapSize;// = 24; // for dev
+
+float generationDelay = 0.1f; // delay in seconds between generations
+bool changingGeneration = false;
+float generationTimer; // tracking delay
 /* Game start */
 void Game::start(){
 
@@ -227,21 +231,29 @@ void ConwayGameOfLife(float dt){
        if (newTileData[i].isVisible()){
             // this tile is 'alive'
             if (livingNeighbors > 3){
+                map->tileData[i].setColor(RED); // dead
                 newTileData[i].setVisible(false); // kill this tile due to over population
             }else if (livingNeighbors < 2){
+                map->tileData[i].setColor(RED); // dead
                 newTileData[i].setVisible(false); // kill this tile due to under population
+            }else {
+                map->tileData[i].setColor(WHITE); // dead
             }
         }else {
             // this tile is 'dead'
             if (livingNeighbors == 3) {
+                map->tileData[i].setColor(DARKGRAY); // dead
                 newTileData[i].setVisible(true); // repopulate this tile
+            }else {
+                map->tileData[i].setColor(BLACK); // dead
             }
         }
     }
 
+    // wait
+    // float delayInSeconds = 0.1f; // 100ms 
+    // WaitTime(delayInSeconds); // (tanks fps, need alternate solution)
 
-    float timeElapsed = 0;
-    float delayInSeconds = 0.25f; // 250ms
     map->tileData = newTileData; // set new tile
 
 
@@ -286,10 +298,23 @@ void demoCode(){
         }
     }
 
+
+    if (changingGeneration){
+        generationTimer += frame_dt;
+        if (generationTimer >= generationDelay){
+            TraceLog(LOG_INFO, "Can load next generation, timer: %0.2f", generationTimer);
+            changingGeneration = false;
+        }
+    }
+
     // Hold to increase generation
-    if (IsKeyDown(KEY_SPACE)){
+    if (!changingGeneration && IsKeyDown(KEY_SPACE) || !changingGeneration && GetKeyPressed() == KEY_RIGHT){
         generations++;
-        ConwayGameOfLife(frame_dt); 
+        if (changingGeneration == false){
+        ConwayGameOfLife(frame_dt);
+            changingGeneration = true;
+            generationTimer = 0.0f; // reset timer
+        }
     }
 
     // Reset tilemap
@@ -300,7 +325,7 @@ void demoCode(){
 
     handleCameraTranslate();
     handleCameraZoom();
-  
+    
 }
 // ----------------------------
 
