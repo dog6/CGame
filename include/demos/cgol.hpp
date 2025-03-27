@@ -42,10 +42,13 @@ class ConwayGameOfLife: public ILevel{
     void NextGeneration();
 
     /* ILevel methods */
+    const char* name = "CGOL"; // name of 'level'
     void load() override; // load all game entities
     void start() override; // called once at start of game, after load
     void update() override; // update all game entities
     void render() override; // draw things to screen
+    void close() override;  // uninitialize level
+    const char* getLevelName() override;
 
 };
 

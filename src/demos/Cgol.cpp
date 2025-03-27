@@ -248,6 +248,10 @@ void ConwayGameOfLife::NextGeneration(){
 
 
 /* ILevel methods */
+const char* ConwayGameOfLife::getLevelName(){
+    return this->name;
+}
+
 void ConwayGameOfLife::load(){
     TraceLog(LOG_INFO, "Loading CGOL..");
 
@@ -293,7 +297,6 @@ void ConwayGameOfLife::update(){
 
 void ConwayGameOfLife::render(){
 
-
     rlPushMatrix();
         rlTranslatef(0, 25*50, 0);
         rlRotatef(90, 1, 0, 0);
@@ -309,4 +312,8 @@ void ConwayGameOfLife::render(){
     DrawFPS(20, 20);    // Top drawing
     DrawText(string("Generations: " + to_string(generations)).c_str(), 13, screenHeight-26, 24, GREEN);
     DrawText(string("Zoom: " + to_string(Normalize(cam.zoom, 0, 1))).c_str(), 13, screenHeight-48, 24, GREEN);
+}
+
+void ConwayGameOfLife::close(){
+    delete this; // this will prolly crash game
 }

@@ -1,8 +1,8 @@
 #include "../include/game.hpp"
 #include "../include/demos/cgol.hpp"
+#include "../include/scene_manager.hpp"
 
 float frame_dt;
-Camera2D cam = { 0 };
 ConwayGameOfLife cgol;
 
 /* Constructor/Destructor */
@@ -43,14 +43,23 @@ void Game::run(){
 }
 /*---------------------------*/
 
-/* -- Add game code below -- */
+/* -- Scene Management will load the proper 'ILevel' -- */
+
+SceneManager sceneMan = SceneManager(); // create scene manager
 
 /* Game start */
 void Game::start(){
-    cgol = ConwayGameOfLife();
-    cgol.load(); // load cgol
-    cgol.start();
 
+    // Create 'levels'
+    cgol = ConwayGameOfLife(); // init cgol
+    cgol.name = "CGOL";
+    
+
+    // Add 'levels' to scene manager
+    sceneMan.AddLevel(&cgol);
+    sceneMan.LoadLevelByName("CGOL");
+
+    
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, screenTitle);
     SetTargetFPS(60); // 10 for conway
@@ -59,10 +68,10 @@ void Game::start(){
 
 /* Update loop */
 void Game::update(){
-    cgol.update();
+    sceneMan.UpdateCurrentScene();
 }
 
 /* Draw loop */
 void Game::draw(){
-    cgol.render();
+    sceneMan.RenderCurrentScene();
 }
