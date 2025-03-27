@@ -12,6 +12,7 @@ class Scene {
         vector<Entity*> entitiesInScene;
     public:
         Scene(string name);
+        Scene();
         ~Scene();
         void render(); // render entities in scene
         void update(float dt); // update entities in scene

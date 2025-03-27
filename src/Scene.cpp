@@ -6,6 +6,11 @@ Scene::Scene(string name){
     this->name = name;
 }
 
+Scene::Scene(){
+    this->name = "generic scene";
+}
+
+
 // Deconstructor
 Scene::~Scene(){
     char buff[100];

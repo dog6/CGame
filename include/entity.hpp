@@ -12,6 +12,7 @@ class Entity {
 
     public:
         Entity(string name, Vector2 position, float rot = 0, bool hasCollider = true, bool enabled = true); // constructor
+        Entity();
         ~Entity();
         void draw();    // draw method
         void update(float dt, Vector2 sceneGravity); // update method

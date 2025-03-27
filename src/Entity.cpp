@@ -13,6 +13,15 @@ Entity::Entity(string name, Vector2 position, float rot, bool enabled, bool hasC
     this->hasCollider = hasCollider;
 }
 
+Entity::Entity(){
+    this->name = "";
+    this->body = new Rigidbody(Vector2{0,0});
+    this->isEnabled = true;
+    this->shape = nullptr;
+    this->rotation = 0.0f;
+    this->hasCollider = false;
+}
+
 Entity::~Entity(){
     TraceLog(LOG_INFO, string("Destructed ~Entity() named ").append(this->name).c_str());
 }

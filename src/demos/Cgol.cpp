@@ -1,7 +1,10 @@
 #include "../../include/demos/cgol.hpp"
 
+float generationDelay = 0.1f; // delay in seconds between generations
+bool changingGeneration = false;
+float generationTimer; // tracking delay
 
-bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset, Tilemap* map){
+bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     bool result = false;
     try {
         result = map->tileData[Smallmath::TilemapToIndex(Vector2{pos.x+offset.x, pos.y+offset.y}, map->getSize().x)].isVisible();
@@ -62,7 +65,8 @@ int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
                                     Vector2{-1, 0},                  Vector2{1, 0},
                                     Vector2{-1, 1}, Vector2{0, 1},   Vector2{1, 1} };
         
-    Vector2 v = Vector2SubtractValue(map->getSize(), 1);                                
+    // Vector2 v = Vector2SubtractValue(map->getSize(), 1);
+    Vector2 v = map->getSize();
     int pixelType = IsEdgePixel(pos, v);            
     for (int i = 0; i < offsets.size(); i++){
         switch(pixelType){
@@ -112,55 +116,23 @@ int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
                 }
             break;
             default:
+                TraceLog(LOG_ERROR, "Unidentified pixel location [/CountNeighbors]");
             break;
         }
     }
     return livingNeighbors;
 }
 
-void ConwayGameOfLife::update(Tilemap* map, float tilemapSize, float dt, Vector2 mousePos){
-    vector<Tile> newTileData = map->tileData; // make copy of tileData
-    Vector2 mapSize = map->getSize();
-
-    // look through each tile, find alive neighbors
-    for (int i = 0; i < tilemapSize*tilemapSize; i++){
-
-       Vector2 pos = Smallmath::IndexToTilemap(i, mapSize.x);
-
-       int livingNeighbors = CountNeighbors(pos, map);
-
-       if (newTileData[i].isVisible()){
-            // this tile is 'alive'
-            if (livingNeighbors > 3){
-                newTileData[i].setVisible(false); // kill this tile due to over population
-            }else if (livingNeighbors < 2){
-                newTileData[i].setVisible(false); // kill this tile due to under population
-            }
-        }else {
-            // this tile is 'dead'
-            if (livingNeighbors == 3) {
-                newTileData[i].setVisible(true); // repopulate this tile
-            }
-        }
-    }
-
-
-    float timeElapsed = 0;
-    float delayInSeconds = 0.25f; // 250ms
-    map->tileData = newTileData; // set new tile
-
-
-}
-
-void ConwayGameOfLife::handleInput(Tilemap* map, int* generations){
+void ConwayGameOfLife::handleInput(){
     // Update cursor block
     this->mousePos = GetScreenToWorld2D(GetMousePosition(), this->cam);
 
     // Left click to place tile, right click to delete
-    Tile* hoveredTile = map->getTile(mousePos);
+    Tile* hoveredTile = this->map->getTile(mousePos);
     if (hoveredTile != nullptr){
         // Change tile color
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            Vector2 pos = hoveredTile->getPosition();
             hoveredTile->setVisible(true);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
@@ -168,10 +140,29 @@ void ConwayGameOfLife::handleInput(Tilemap* map, int* generations){
         }
     }
 
-    // Hold to increase generation
-    if (IsKeyDown(KEY_SPACE)){
+    // Press to increase one generation
+    if (GetKeyPressed() == KEY_RIGHT){
         generations++;
-        ConwayGameOfLife(frame_dt); 
+        this->NextGeneration();
+    }
+    // or Hold to increase generation
+    if (IsKeyDown(KEY_SPACE)){
+        
+        if (canLoadNextGeneration){
+            canLoadNextGeneration = false;
+            generations++;
+            this->NextGeneration();
+        }else {
+            // increment timer
+            this->genTime += GetFrameTime();
+            if (this->genTime >= this->delayBetweenGenerations){
+                canLoadNextGeneration = true;
+            }
+        }
+    }
+
+    if (GetKeyPressed() == KEY_H){
+        this->showColors = !this->showColors;
     }
 
     // Reset tilemap
@@ -181,7 +172,7 @@ void ConwayGameOfLife::handleInput(Tilemap* map, int* generations){
     }
 }
 
-void ConwayGameOfLife::handleCameraZoom(Vector2 mousePos){
+void ConwayGameOfLife::handleCameraZoom(){
     float wheel = GetMouseWheelMove();
     if (wheel != 0)
     {
@@ -201,4 +192,121 @@ void ConwayGameOfLife::handleCameraTranslate(){
         delta = Vector2Scale(delta, -1.0f/cam.zoom);
         cam.target = Vector2Add(cam.target, delta);
     }
+}
+
+ConwayGameOfLife::ConwayGameOfLife(){
+    TraceLog(LOG_INFO, "Initialized CGOL");
+    this->scene = new Scene("CGOL");
+};
+
+ConwayGameOfLife::~ConwayGameOfLife() {
+    TraceLog(LOG_INFO, "Closing CGOL..");
+};
+
+void ConwayGameOfLife::NextGeneration(){
+        vector<Tile> newTileData = map->tileData; // make copy of tileData
+    Vector2 mapSize = map->getSize();
+
+    // look through each tile, find alive neighbors
+    for (int i = 0; i < tilemapSize*tilemapSize; i++){
+
+       Vector2 pos = Smallmath::IndexToTilemap(i, mapSize.x);
+
+       int livingNeighbors = CountNeighbors(pos, map);
+
+       if (newTileData[i].isVisible()){
+            
+            // Any live cell with two or three live neighbours lives on to the next generation.
+            if (livingNeighbors == 2 || livingNeighbors == 3){
+                continue;
+            }
+
+            // Any live cell with more than three live neighbours dies, as if by overpopulation.
+            if (livingNeighbors > 3){
+                newTileData[i].setVisible(false); // kill this tile due to over population
+            }
+
+            // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+            if (livingNeighbors < 2){
+                newTileData[i].setVisible(false); // kill this tile due to under population
+            }
+
+        }else {
+
+            // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+            if (livingNeighbors == 3) {
+                newTileData[i].setVisible(true); // repopulate this tile
+            }
+
+        }
+    }
+
+    float timeElapsed = 0;
+    float delayInSeconds = 0.25f; // 250ms
+    map->tileData = newTileData; // set new tile
+}
+
+
+/* ILevel methods */
+void ConwayGameOfLife::load(){
+    TraceLog(LOG_INFO, "Loading CGOL..");
+
+    TraceLog(LOG_INFO, "Creating tilemap entity for CGOL..");
+    // Create entities
+    tilemap = new Entity("first tilemap", Vector2{50,50}, true);
+    tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize+tileGap)), (screenHeight/(tileSize+tileGap))});
+    map = new Tilemap(Vector2Zero(), Vector2{tilemapSize, tilemapSize}, Vector2{tileSize, tileSize}, tileGap);
+    tilemap->shape = map; // give tilemap its shape
+    tilemap->isEnabled = true;
+    TraceLog(LOG_INFO, "Tilemap created.");
+
+    // Create camera2D
+    cam.target=map->position;
+    cam.offset = Vector2{0,0};
+    cam.rotation = 0.0f;
+    cam.zoom = 0.5f;
+    TraceLog(LOG_INFO, "Camera created.");   
+
+
+
+}
+
+void ConwayGameOfLife::start(){
+    TraceLog(LOG_INFO, "Starting CGOL..");
+   
+
+    map->setTileData(WHITE, false);
+    map->hasOutline = true;
+    map->outlineColor = WHITE;
+    tilemap->shape = map; // give tilemap it's shape
+    
+    // Or add multiple entities at once instead
+    TraceLog(LOG_INFO, "Added tilemap to scene entities");
+    this->scene->addEntities(vector<Entity*>{tilemap});
+}
+
+void ConwayGameOfLife::update(){
+    handleCameraTranslate();
+    handleCameraZoom();
+    handleInput();
+}
+
+void ConwayGameOfLife::render(){
+
+
+    rlPushMatrix();
+        rlTranslatef(0, 25*50, 0);
+        rlRotatef(90, 1, 0, 0);
+    rlPopMatrix();
+
+    ClearBackground(BLACK); // Bottom drawing
+
+    // Draw 2D entities
+    BeginMode2D(this->cam);
+    this->scene->render();
+    EndMode2D();
+
+    DrawFPS(20, 20);    // Top drawing
+    DrawText(string("Generations: " + to_string(generations)).c_str(), 13, screenHeight-26, 24, GREEN);
+    DrawText(string("Zoom: " + to_string(Normalize(cam.zoom, 0, 1))).c_str(), 13, screenHeight-48, 24, GREEN);
 }
