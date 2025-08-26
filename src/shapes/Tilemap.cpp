@@ -7,58 +7,191 @@ Tilemap::Tilemap(Vector2 position, Vector2 size, Vector2 tile_size, float tile_g
     this->tileSize = tile_size;
     this->tileGap = tile_gap;
     this->visible = visible;
-    setTileData(WHITE);
+    this->outlineColor = WHITE;
+    setTileSize(tile_size);
 }
 
 Tilemap::~Tilemap(){ TraceLog(LOG_INFO, "Destructed tilemap"); }
 
-void Tilemap::setTileData(Color color){
-    this->tileData = vector<Tile>{}; // reset tileData
-    for (int x = 0; x < size.x; x++){
-        for (int y = 0; y < size.y; y++){
-            int idx = y*size.x+x;
-            // float tileX = this->position.x+x*(tileSize.x+tileGap);
-            // float tileY = this->position.y+y*(tileSize.y+tileGap);
-            float tileX = this->position.x+x*(tileSize.x+tileGap);
-            float tileY = this->position.y+y*(tileSize.y+tileGap);
-            this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)))); // init default white colored tile @ position
-        }
-    }
-}
-
 void Tilemap::setTileVisible(Vector2 pos, bool isVisible){
    // not most performant option
    for (int i = 0; i < tileData.size(); i++){
-    if (CheckCollisionPointRec(pos, tileData[i].rect.ToRectangle(tileData[i].getPosition()))){
+      // Check distance from tile to point
+      if (Vector2Distance(tileData[i].getPosition(), pos) > 10){
+        continue;
+    }
+
+    if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
         tileData[i].setVisible(isVisible);
     }
 }
 }
 
+
+
+Vector2 Tilemap::getTileSize(){
+    // resize all tiles
+    return this->tileData[0].getSize();
+}
+
+
 void Tilemap::setTile(Vector2 pos, Tile tile){
     // not most performant option
     for (int i = 0; i < tileData.size(); i++){
-        if (CheckCollisionPointRec(pos, tileData[i].rect.ToRectangle(tileData[i].getPosition()))){
+          // Check distance from tile to point
+          Vector2 tPos = tileData[i].getPosition();
+          if (Vector2Distance(Vector2{tPos.x-(this->size.x/2), tPos.y-(this->size.y/2)}, pos) > 10){
+            continue;
+        }
+
+        if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
             tileData[i] = tile;
         }
     }
 }
 
-void Tilemap::draw(Vector2 tilemapPos){
+Tile* Tilemap::getTile(Vector2 pos){
+    for (int i = 0; i < tileData.size(); i++){
+        // Check distance from tile to point
+         if (Vector2Distance(tileData[i].getPosition(), pos) > Smallmath::sizeToRadius(tileSize*2)){
+            continue;
+        }
+
+        if (CheckCollisionPointRec(pos, tileData[i].rect->toRectangle(tileData[i].getPosition()))){
+            return &tileData[i];
+        }
+    }
+    return nullptr;
+}
+
+void Tilemap::draw(Vector2 tilemapPos, float rot){
     if (this->visible){ // if whole tilemap is visible
         for (int i = 0; i < tileData.size(); i++){
             if (tileData[i].isVisible()){ // if individual tile is visible
-                tileData[i].draw(tilemapPos); // draw each tile
+                tileData[i].draw(tilemapPos, rot); // draw each tile
             }
         }
+
+        if (this->hasOutline){
+            
+            /*DrawRectangleLines(this->position.x-this->tileGap,
+                 this->position.y-this->tileGap,
+                  ((this->tileSize.x+this->tileGap)*this->size.x)+(tileSize.x/2)+this->tileGap,
+                   ((this->tileSize.y+this->tileGap)*this->size.y)+(tileSize.y/2)+this->tileGap,
+                    this->outlineColor);*/
+                DrawRectangleLinesEx(this->toRectangle(this->position),
+                                     1,
+                                     this->outlineColor);
+
+        }
     }
+
 }
 
-void Tilemap::setSize(Vector2 size){ this->size = size; }
+Rectangle Tilemap::toRectangle(Vector2 pos){
+    Rectangle r = Rectangle();
+    Vector2 sz = Vector2{this->getSize().x*this->tileSize.x+this->tileGap, this->getSize().y*this->tileSize.y+this->tileGap};
+    r.width = sz.x;
+    r.height = sz.y;
+    r.x = pos.x;
+    r.y = pos.y;
+    return r;
+}
+
+void Tilemap::setSize(Vector2 size){ 
+    this->size = size;
+}
 Vector2 Tilemap::getSize() { return this->size; }
 
 bool Tilemap::isVisible() { return this->visible; }
 void Tilemap::setVisible(bool isVisible){ this->visible = isVisible; };
-
+vector<Vector2> Tilemap::getVertices(Vector2 pos){
+    vector<Vector2> result;
+    // TL,TR,BR,BL, so they're inserted backwards
+    Vector2 sz = this->getSize();
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y+(sz.x/2)}); // BL 
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y+(sz.x/2)}); // BR
+    result.push_back(Vector2{pos.x+(sz.x/2), pos.y-(sz.x/2)}); // TR
+    result.push_back(Vector2{pos.x-(sz.x/2), pos.y-(sz.x/2)}); // TL 
+    return result;
+  }
 // Does nothing for tilemap
 Color Tilemap::getColor() { return WHITE; };
+void Tilemap::setColor(Color color) { setAllTilesColor(color); };
+
+
+vector<Line> Tilemap::getLines(Vector2 pos){
+    vector<Line> result;
+    vector<Vector2> points = this->getVertices(pos);
+    // for each point, make a line
+    for (int i = 0; i <= points.size(); i += 2){
+        result.push_back(*(new Line(points[i], points[i+1], RED)));
+    }
+    return result;
+}
+
+void Tilemap::setTileData(Color color, Vector2 size, bool visible){
+    this->tileData = vector<Tile>{}; // reset tileData
+    for (int x = 0; x < size.x; x++){
+        for (int y = 0; y < size.y; y++){
+            int idx = y*size.x+x;
+            float tileX = this->position.x+x*(tileSize.x+tileGap);
+            float tileY = this->position.y+y*(tileSize.y+tileGap);
+            this->tileData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, color)), visible)); // init default white colored tile @ position
+        }
+    }
+}
+
+void Tilemap::setTileGap(float gap){
+    this->tileGap = gap;
+}
+
+void Tilemap::refreshMap(){
+    vector<Tile> newData = vector<Tile>{};
+    for (int idx = 0; idx < Smallmath::Vector2Product(size); idx++){
+            Vector2 pos = Smallmath::IndexToTilemap(idx, size.x);
+            float tileX = this->position.x+pos.x*(tileSize.x+tileGap);
+            float tileY = this->position.y+pos.y*(tileSize.y+tileGap);
+            newData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(tileSize, this->tileData[idx].getColor())), this->tileData[idx].isVisible())); // init default white colored tile @ position
+    }
+    this->tileData = newData;
+}
+
+// Generate new map with same tileData, but with new map size, tile size, and tile gap
+void Tilemap::updateTilemap(Vector2 mapSize, Vector2 tileSize, float tileGap, Color color){
+    
+    this->size = mapSize;
+    this->tileSize = tileSize;
+    this->tileGap = tileGap;
+    this->setColor(color);
+
+    vector<Tile> newData;
+    newData.reserve(this->tileData.size());
+    for (int x = size.x; x >= 0; x--){
+        for (int y = size.y; y >= 0; y--){
+            int idx = Smallmath::TilemapToIndex(Vector2{(float)x,(float)y}, size.x);
+            float tileX = this->position.x+x*(this->tileSize.x+this->tileGap);
+            float tileY = this->position.y+y*(this->tileSize.y+this->tileGap);
+            if (idx < this->tileData.size()){
+                newData.push_back(tileData[idx]);
+                continue;
+            }
+            // create new tile
+            newData.push_back(Tile(Vector2{tileX,tileY}, *(new Rect(this->tileSize, this->getColor())), this->defaultVisible));
+        }
+    }
+    this->tileData = newData;
+
+}
+
+void Tilemap::setTileSize(Vector2 s){
+    for (int i = 0; i < tileData.size(); i++){
+        tileData[i].setSize(s);
+   }
+}
+
+void Tilemap::setAllTilesColor(Color color){
+    for (int i = 0; i < tileData.size(); i++){   
+        this->tileData[i].setColor(color);
+    }
+}

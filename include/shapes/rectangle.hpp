@@ -13,6 +13,7 @@ class Rect: public IShape {
     public:
     // constructors
     Rect();
+    Rect(IShape* shape);
     Rect(Vector2 size, Color color, bool visible = true); 
     ~Rect(); // deconstructor
     void setVisible(bool isVisible) override;
@@ -22,9 +23,12 @@ class Rect: public IShape {
     void setSize(Vector2 size) override; // set size
     
     Color getColor() override; // get color
-    void draw(Vector2 position) override;
-    
-    Rectangle ToRectangle(Vector2 position);
+    void setColor(Color color) override; // set color
+    void draw(Vector2 position, float rot) override;
+    vector<Vector2> getVertices(Vector2 pos) override;
+    vector<Line> getLines(Vector2 pos) override;
+
+    Rectangle toRectangle(Vector2 position);
 
 };
 #endif

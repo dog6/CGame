@@ -1,0 +1,77 @@
+/*#include "../include/game.hpp"
+#include "../include/demos/cgol.hpp"
+#include "../include/scene_manager.hpp"
+float frame_dt;
+ConwayGameOfLife cgol;
+
+/* Constructor/Destructor */
+Game::Game(){
+    TraceLog(LOG_INFO, "Game started (constructor)");
+}
+Game::~Game(){
+    TraceLog(LOG_INFO, "Game closed (destructor)");
+}
+
+/* Game loop & Exit methods */
+void Game::close(){
+    CloseWindow();        // Close window and OpenGL context
+}
+
+void Game::run(){
+    // Initialization
+    Game::start();
+
+
+    // Main game loop
+    while (!WindowShouldClose())    // Detect window close button or ESC key
+    {
+        frame_dt = GetFrameTime();
+
+        // Update
+        Game::update();
+        
+        // Draw
+        BeginDrawing();
+            Game::draw();
+        EndDrawing();
+
+    }
+
+    // De-Initialization
+    Game::close();
+}
+/*---------------------------*/
+
+/* -- Scene Management will load the proper 'ILevel' -- */
+
+SceneManager sceneMan = SceneManager(); // create scene manager
+
+/* Game start */
+void Game::start(){
+    
+    // Create 'levels'
+    cgol = ConwayGameOfLife(); // init cgol
+    cgol.name = "CGOL";
+    
+
+    // Add 'levels' to scene manager
+    sceneMan.AddLevel(&cgol);
+    sceneMan.LoadLevelByName("CGOL"); // load & start CGOL
+
+    
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    InitWindow(screenWidth, screenHeight, screenTitle);
+    SetTargetFPS(60); // 10 for conway
+}
+
+
+/* Update loop */
+void Game::update(){
+    sceneMan.UpdateCurrentScene();
+}
+
+/* Draw loop */
+void Game::draw(){
+    sceneMan.RenderCurrentScene();
+}
+*/

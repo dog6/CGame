@@ -1,5 +1,5 @@
 #include "game.hpp"
-
+#include "smallmath.hpp"
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 class Rigidbody {
@@ -8,6 +8,7 @@ class Rigidbody {
         Rigidbody(Vector2 position, Vector2 velocity = Vector2{0,0}, Vector2 acceleration = Vector2{0,0}, Vector2 force = Vector2{0,0}, bool kinematic = true);
         ~Rigidbody();
         void update(float dt, Vector2 forces); // update physics of body
+        void resetForce(); // reset forces on vall to vector2zero
         bool isKinematic; // true = ignores external forces
         float mass; // mass of object in kg
         Vector2 position; // position of body/entity
