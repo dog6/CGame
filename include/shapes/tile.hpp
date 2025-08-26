@@ -11,6 +11,7 @@ class Tile: public IShape {
     bool visible;
     
     public:
+    Tile();
     Tile(Vector2 position, Vector2 size, Color color, bool visible = true);
     Tile(Vector2 position, Rect& Rect, bool visible = true);
     ~Tile();

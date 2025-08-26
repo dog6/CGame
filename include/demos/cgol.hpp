@@ -7,6 +7,7 @@
 #include "../../include/level.hpp"
 
 
+// building computers
 // somehow get all the code for CGOL in here
 
 class ConwayGameOfLife: public ILevel{
@@ -41,6 +42,7 @@ class ConwayGameOfLife: public ILevel{
     int CountNeighbors(Vector2 pos, Tilemap* map);
     int IsEdgePixel(Vector2 pos, Vector2 sz);
     void NextGeneration();
+    void handleMenu(); // handles CGOL menu
 
     /* ILevel methods */
     const char* name = "CGOL"; // name of 'level'
@@ -52,5 +54,4 @@ class ConwayGameOfLife: public ILevel{
     const char* getLevelName() override;
 
 };
-
 #endif

@@ -3,9 +3,13 @@
 bool Tile::isVisible() { return this->visible; };
 void Tile::setVisible(bool isVisible) { this->visible = isVisible; };
 
+Tile::Tile(){
+    this->position = Vector2{0,0};
+    this->rect = new Rect{Vector2{0,0}, BLACK, false};
+}
+
 Tile::Tile(Vector2 position, Vector2 size, Color color, bool visible){
     this->position = position;
-    // this->rect = Rect{size, color, true};
     this->rect = new Rect{size, color, true};
     this->visible = visible;
 }

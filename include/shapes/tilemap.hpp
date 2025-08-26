@@ -13,6 +13,7 @@ class Tilemap: public IShape {
     
     
     public:
+    bool defaultVisible = true; // when the map is refreshed, should all tiles be visible?
     Vector2 position; // position of tilemap
     bool hasOutline;
     Color outlineColor;
@@ -31,8 +32,10 @@ class Tilemap: public IShape {
     */
    void refreshMap();
     void setAllTilesColor(Color color); // sets all tiles
-    void setTileData(Color color, bool visible);
-
+    void setTileData(Color color, Vector2 size, bool visible);
+    void setTileGap(float tileGap);
+    void updateTilemap(Vector2 mapSize, Vector2 tileSize, float tileGap, Color color);
+    Rectangle toRectangle(Vector2 pos);
     /* IShape methods */
     void setVisible(bool isVisible) override;
     bool isVisible() override;

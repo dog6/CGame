@@ -1,24 +1,13 @@
 #include "../../include/demos/cgol.hpp"
 #include "../../lib/raygui/raygui.h"
 
-#define GUI_CGOL_UI_IMPLEMENTATION
-#include "../../include/ui/gui_cgol_ui.h"
+#define GUI_CGOLMENU_IMPLEMENTATION
+#include "../../include/ui/gui_CGOLMenu.h"
+GuiCGOLMenuState gameState;
 
-const char* guiStylePath = "../../assets/ui/styles/style_dark.rgs";
+
 bool changingGeneration = false;
 float generationTimer; // tracking delay
-
-GuiCgolUiState coglstate;
-/*
-typedef struct {
-    float genDelay = 0.1f; // delay in seconds between generations
-    int tileSize;
-    Color tileColor;
-} GameState;
-
-GameState gameState;*/
-
-GuiCgolUiState gameState;
 
 bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     bool result = false;
@@ -29,6 +18,7 @@ bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     }
     return result;
 }
+
 
 /* returns pixel location as integer value
     0 - center
@@ -42,28 +32,30 @@ bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     8 - top left corner 'north-west'
     parameters `<Vector2>` position, '<Vector2>' tilemap size
 */
-int ConwayGameOfLife::IsEdgePixel(Vector2 pos, Vector2 sz){
-    if (pos.x > 0 && pos.y > 0 && pos.x < sz.y && pos.y < sz.x){
-        return 0; // center
-    }else if (pos.x > 0  && pos.x < sz.x && pos.y == 0) {
-        return 1; // top edge 'north'
-    }else if (pos.x == sz.x && pos.y == 0){
-        return 2; // top right corner 'north-east'
-    }else if (pos.x == sz.x && pos.y < sz.y && pos.y > 0){
-        return 3; // right edge 'east'
-    }else if (pos.x == sz.x && pos.y == sz.y) {
-        return 4; // bottom right corner 'south-east'
-    }else if (pos.x > 0  && pos.x < sz.x && pos.y == sz.y) {
-        return 5; // bottom edge 'south'
-    }else if (pos.x == 0 && pos.y == sz.y){
-        return 6; // bottom left corner 'south-west'
-    }else if (pos.x == 0 && pos.y < sz.y && pos.y > 0){
-        return 7; // left edge 'west'
-    }else if (pos.x == 0 && pos.y == 0){
-        return 8; // top left corner 'north-west'
-    }
-    return -1;
+int ConwayGameOfLife::IsEdgePixel(Vector2 pos, Vector2 sz) {
+    int x = static_cast<int>(pos.x);
+    int y = static_cast<int>(pos.y);
+    int maxX = static_cast<int>(sz.x) - 1;
+    int maxY = static_cast<int>(sz.y) - 1;
+
+    // Debug print
+    // << "Checking pos (" << x << "," << y << ") on grid (" << maxX + 1 << "x" << maxY + 1 << ")\n"
+    TraceLog(LOG_INFO, "Checking pos: (", x, ", ", y, ")");
+
+    if (x > 0 && x < maxX && y > 0 && y < maxY) return 0; // center
+    if (x > 0 && x < maxX && y == 0) return 1;            // top edge
+    if (x == maxX && y == 0) return 2;                    // top right corner
+    if (x == maxX && y > 0 && y < maxY) return 3;         // right edge
+    if (x == maxX && y == maxY) return 4;                 // bottom right corner
+    if (x > 0 && x < maxX && y == maxY) return 5;         // bottom edge
+    if (x == 0 && y == maxY) return 6;                    // bottom left corner
+    if (x == 0 && y > 0 && y < maxY) return 7;            // left edge
+    if (x == 0 && y == 0) return 8;                       // top left corner
+
+    return -1; // invalid or out of bounds
 }
+
+
 
 bool ConwayGameOfLife::NotMovingTowards(Vector2 checkingDir, Vector2 possibleDir) {
     return (checkingDir.x != possibleDir.x || checkingDir.y != possibleDir.y);
@@ -74,18 +66,27 @@ bool ConwayGameOfLife::NotMovingTowards(Vector2 checkingDir, Args... possibleDir
     return (... && NotMovingTowards(checkingDir, possibleDirs));
 }
 
-int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
-    int livingNeighbors = 0;
+const std::array<Vector2, 8> offsets{ Vector2{-1, -1}, Vector2{0, -1}, Vector2{1, -1},
+Vector2{-1, 0},                  Vector2{1, 0},
+Vector2{-1, 1}, Vector2{0, 1},   Vector2{1, 1} };
 
-    std::array<Vector2, 8> offsets{ Vector2{-1, -1}, Vector2{0, -1}, Vector2{1, -1},
-                                    Vector2{-1, 0},                  Vector2{1, 0},
-                                    Vector2{-1, 1}, Vector2{0, 1},   Vector2{1, 1} };
-        
-    // Vector2 v = Vector2SubtractValue(map->getSize(), 1);
-    Vector2 v = map->getSize();
-    int pixelType = IsEdgePixel(pos, v);            
-    for (int i = 0; i < offsets.size(); i++){
+
+int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
+    if (map == nullptr){
+        TraceLog(LOG_ERROR, "Unable to count neighbors, map is null");
+    }
+    
+    TraceLog(LOG_INFO, "Counting neighbors @ position ", pos.x, ", ", pos.y);
+    int livingNeighbors = 0;
+    
+    
+    int pixelType = IsEdgePixel(pos, map->getSize());
+    TraceLog(LOG_INFO, "PixelType: ", pixelType);    
+    for (int i = 0; i < offsets.size()-1; i++){
         switch(pixelType){
+            case -1:
+                TraceLog(LOG_ERROR, "[/IsEdgePixel] Unidentified pixel location");
+            break;
             case 0: // center
                 if (NeighborAlive(pos, offsets[i])){
                     livingNeighbors++;
@@ -132,16 +133,38 @@ int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
                 }
             break;
             default:
-                TraceLog(LOG_ERROR, "Unidentified pixel location [/CountNeighbors]");
+                TraceLog(LOG_ERROR, "Failed to count neighbors");
             break;
         }
     }
+    TraceLog(LOG_INFO, "Counted ", livingNeighbors, " neighbors");
     return livingNeighbors;
 }
 
 void ConwayGameOfLife::handleInput(){
     // Update cursor block
     this->mousePos = GetScreenToWorld2D(GetMousePosition(), this->cam);
+
+
+    if (IsKeyPressed(KEY_M) || IsKeyPressed(KEY_GRAVE)) {
+        TraceLog(LOG_INFO, "Toggling state of CGOL Menu");
+        if (gameState.cgolWindowActive){
+            gameState.cgolWindowActive = false;
+            TraceLog(LOG_INFO, "CGOL Menu closed.");
+        }else {
+            gameState.cgolWindowActive = true;
+       
+            gameState = InitGuiCGOLMenu();
+            gameState.tileGapValue = map->tileGap;
+            gameState.tileSizeValue = map->getTileSize().x;
+            gameState.mapSizeValue = map->getSize().x;
+            gameState.tileColorPickerValue = map->getColor();
+
+
+            TraceLog(LOG_INFO, "CGOL Menu opened.");
+        }
+    }
+
 
     // Left click to place tile, right click to delete
     Tile* hoveredTile = this->map->getTile(mousePos);
@@ -157,7 +180,7 @@ void ConwayGameOfLife::handleInput(){
     }
 
     // Press to increase one generation
-    if (GetKeyPressed() == KEY_RIGHT){
+    if (IsKeyPressed(KEY_RIGHT)){
         generations++;
         this->NextGeneration();
     }
@@ -173,19 +196,21 @@ void ConwayGameOfLife::handleInput(){
             this->genTime += GetFrameTime();
             if (this->genTime >= this->delayBetweenGenerations){
                 canLoadNextGeneration = true;
+                genTime = 0;
             }
         }
     }
 
-    if (GetKeyPressed() == KEY_H){
+    if (IsKeyPressed(KEY_H)){
         this->showColors = !this->showColors;
     }
 
     // Reset tilemap
     if (IsKeyPressed(KEY_C)){
         TraceLog(LOG_INFO, "Reset tilemap");
-        map->setTileData(WHITE, false);
+        map->setTileData(WHITE, map->getSize(), false);
     }
+
 }
 
 void ConwayGameOfLife::handleCameraZoom(){
@@ -213,6 +238,7 @@ void ConwayGameOfLife::handleCameraTranslate(){
 ConwayGameOfLife::ConwayGameOfLife(){
     TraceLog(LOG_INFO, "Initialized CGOL");
     this->scene = new Scene("CGOL");
+    // this->gameState = InitGuiCGOLMenu();
 };
 
 ConwayGameOfLife::~ConwayGameOfLife() {
@@ -220,48 +246,70 @@ ConwayGameOfLife::~ConwayGameOfLife() {
 };
 
 void ConwayGameOfLife::NextGeneration(){
-        vector<Tile> newTileData = map->tileData; // make copy of tileData
-    Vector2 mapSize = map->getSize();
-
+    TraceLog(LOG_INFO, "Running generation ", generations);
+    std::vector<Tile> newTileData = map->tileData; // make copy of tileData
     // look through each tile, find alive neighbors
-    for (int i = 0; i < tilemapSize*tilemapSize; i++){
-
-       Vector2 pos = Smallmath::IndexToTilemap(i, mapSize.x);
-
-       int livingNeighbors = CountNeighbors(pos, map);
-
-       if (newTileData[i].isVisible()){
-            
+    for (int i = Smallmath::Vector2Product(map->getSize()); i > 0; i--) {
+        Vector2 pos = Smallmath::IndexToTilemap(i, map->getSize().x);
+        int livingNeighbors = CountNeighbors(pos, map);
+        if (newTileData[i].isVisible()){
             // Any live cell with two or three live neighbours lives on to the next generation.
-            if (livingNeighbors == 2 || livingNeighbors == 3){
+            if (livingNeighbors != 2 && livingNeighbors != 3){
+                newTileData[i].setVisible(false); // kill this tile due to under population
                 continue;
             }
 
-            // Any live cell with more than three live neighbours dies, as if by overpopulation.
-            if (livingNeighbors > 3){
-                newTileData[i].setVisible(false); // kill this tile due to over population
+            if (livingNeighbors <= 1){
+                newTileData[i].setVisible(false); // under pop
             }
 
-            // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-            if (livingNeighbors < 2){
-                newTileData[i].setVisible(false); // kill this tile due to under population
+            if (livingNeighbors >= 4){
+                newTileData[i].setVisible(false); // over pop
             }
 
         }else {
-
             // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
             if (livingNeighbors == 3) {
                 newTileData[i].setVisible(true); // repopulate this tile
+                continue;
+            }else {
+                newTileData[i].setVisible(false); // repopulate this tile
             }
-
         }
     }
+
 
     float timeElapsed = 0;
     float delayInSeconds = 0.25f; // 250ms
     map->tileData = newTileData; // set new tile
 }
 
+void ConwayGameOfLife::handleMenu(){
+   
+    if (!gameState.cgolWindowActive){
+        return; // return if window inactive
+    }
+
+    map->setAllTilesColor(gameState.tileColorPickerValue);
+
+    if (gameState.applyButtonPressed){
+        // Update map with new settings
+        TraceLog(LOG_INFO, "COGL Menu Settings applied");
+        map->updateTilemap( Vector2{(float)gameState.mapSizeValue,(float)gameState.mapSizeValue},
+                            Vector2{(float)gameState.tileSizeValue,(float)gameState.tileSizeValue},
+                            gameState.tileGapValue,
+                            gameState.tileColorPickerValue
+        );
+        tilemapSize = gameState.mapSizeValue;
+    }
+
+    if (gameState.clearGridButtonPressed){
+        map->setTileData(WHITE, map->getSize(), false);
+    }
+
+
+
+}
 
 /* ILevel methods */
 const char* ConwayGameOfLife::getLevelName(){
@@ -274,7 +322,8 @@ void ConwayGameOfLife::load(){
     TraceLog(LOG_INFO, "Creating tilemap entity for CGOL..");
     // Create entities
     tilemap = new Entity("first tilemap", Vector2{50,50}, true);
-    tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize+tileGap)), (screenHeight/(tileSize+tileGap))});
+    // tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize+tileGap)), (screenHeight/(tileSize+tileGap))});
+    tilemapSize = 128;
     map = new Tilemap(Vector2Zero(), Vector2{tilemapSize, tilemapSize}, Vector2{tileSize, tileSize}, tileGap);
     tilemap->shape = map; // give tilemap its shape
     tilemap->isEnabled = true;
@@ -293,18 +342,32 @@ void ConwayGameOfLife::load(){
 
 void ConwayGameOfLife::start(){
     TraceLog(LOG_INFO, "Starting CGOL..");
+    
+    /*try {
+        GuiLoadStyle(guiStylePath);
+    }catch (exception e){
+        TraceLog(LOG_ERROR, "Failed to load gui style.\n", e.what());
+    }*/
 
-    gameState = InitGuiCgolUi(); // init gui
-    // state.gen_delay_txtboxValue = delayBetweenGenerations;
-    // state.tile_sz_txtboxValue = this->tileSize;
-    // state.gen_delay_txtboxValue = this->delayBetweenGenerations;
+    // set default menu settings
+    gameState.mapSizeValue = map->getSize().x;
+    gameState.tileSizeValue = this->tileSize;
+    gameState.tileColorPickerValue = WHITE;
+    gameState.tileGapValue = this->tileGap;
 
-    map->setTileData(WHITE, false);
+    // Create tilemap
+    /*map->setTileData(WHITE, map->getSize(), false);
     map->hasOutline = true;
     map->outlineColor = WHITE;
-    tilemap->shape = map; // give tilemap it's shape
+    map->defaultVisible = false; // when map is refreshed, tiles should not be visible
+    tilemap->shape = map; // give tilemap it's shape*/
+    map->setTileData(WHITE, map->getSize(), false);
+    map->hasOutline = true;
+    map->outlineColor = WHITE;
+    map->defaultVisible = false;
+    tilemap->shape = map; 
     
-    // Or add multiple entities at once instead
+    // Add entities to scene
     TraceLog(LOG_INFO, "Added tilemap to scene entities");
     this->scene->addEntities(vector<Entity*>{tilemap});
 }
@@ -313,6 +376,7 @@ void ConwayGameOfLife::update(){
     handleCameraTranslate();
     handleCameraZoom();
     handleInput();
+    handleMenu();
 }
 
 bool showMessageBox = false;
@@ -330,18 +394,12 @@ void ConwayGameOfLife::render(){
     this->scene->render();
     EndMode2D();
 
-    GuiCgolUi(&gameState);
-    map->setColor(gameState.tile_colorPickerValue);
-    map->setTileSize(Vector2{(float)gameState.tileSize_txtboxValue, (float)gameState.tileSize_txtboxValue});
-    this->delayBetweenGenerations = gameState.genDelay_txtboxValue;
+    // GuiCgolUi(&gameState);
+    // map->setColor(gameState.tile_colorPickerValue);
+    // map->setTileSize(Vector2{(float)gameState.tileSize_txtboxValue, (float)gameState.tileSize_txtboxValue});
+    // this->delayBetweenGenerations = gameState.genDelay_txtboxValue;
 
- 
-    try {
-        GuiLoadStyle(guiStylePath);
-    }catch (exception e){
-        TraceLog(LOG_ERROR, "Failed to find GUI style '%s'", guiStylePath);
-        return;
-    }
+    GuiCGOLMenu(&gameState); // sync game state w/ menu
   
     DrawFPS(20, 20);    // Top drawing
     DrawText(string("Generations: " + to_string(generations)).c_str(), 13, screenHeight-26, 24, GREEN);

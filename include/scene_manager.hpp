@@ -6,14 +6,14 @@
 // Lives in game class, loads 'level'
 class SceneManager {
   private:
-  vector<ILevel*> levels;
+  std::vector<ILevel*> levels;
   ILevel* currentLevel;
   
   public:
   SceneManager();
   ~SceneManager();
   void AddLevel(ILevel* level);                 // adds level to scene manager
-  void AddLevels(vector<ILevel*> lvls);         // adds multiple levels to scene manager
+  void AddLevels(std::vector<ILevel*> lvls);         // adds multiple levels to scene manager
   void RemoveLevel(int i);                      // removes level from scene manager using a given id
   void RemoveLevelByName(const char* name);     // removes level from scene manager using a given name
   void LoadLevel(int i);                        // loads level by it's index

@@ -39,7 +39,6 @@
 #include "smallmath.hpp" // custom static math class to keep it agnostic
 // -----------------------------------------
 
-
 // # Game Definitions----------------------------
 /* These are mainly here as an example  *
 *  and should eventually be moved to *
