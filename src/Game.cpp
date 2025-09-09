@@ -1,7 +1,6 @@
 #include "../include/game.hpp"
 #include "../include/scene.hpp"
 #include "../include/entity.hpp"
-// #include "../include/shapes/rectangle.hpp"
 #include "../include/shapes/ellipse.hpp"
 #include "../include/shapes/tilemap.hpp"
 
@@ -45,7 +44,6 @@ void Game::run(){
 
 /* -- Add game code below -- */
 
-// Vector2 screenCenter = Vector2{float(GetScreenWidth()/2), float(GetScreenHeight()/2)};
 Vector2 screenCenter = Vector2{float(screenWidth/2), float(screenHeight/2)};
 Vector2 mousePos;
 
@@ -78,20 +76,10 @@ void Game::start(){
     ball.body->mass = 0.3; // 0.3 kg
     ball.body->isKinematic = false;
     ball.collideWithCamera = true;
-    // ball.shape = new Ellipse(Vector2{36, 12}, BLUE); // give ball shape
     
     // Create rectangle
     cursorRectangle.shape = new Rect(Vector2{12, 12}, RED); // give cursor shape
     
-    /*
-    * Add entites to scene
-    * Drawn first
-        demoScene.addEntity(tilemap);    
-        demoScene.addEntity(cursorRectangle);
-        demoScene.addEntity(ball); 
-    * Drawn last
-    */
-
     // Set scene gravity
     // demoScene.setGravity(Vector2{3, 9.81});
 
@@ -99,8 +87,6 @@ void Game::start(){
     demoScene.addEntities(vector<Entity>{tilemap, ball, cursorRectangle});
 
 }
-
-// bool ball_growing = true;
 
 /* Update loop */
 void Game::update(){
