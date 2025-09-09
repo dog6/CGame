@@ -24,9 +24,9 @@ bool Ngon::isVisible() { return this->visible; }
 vector<Vector2> Ngon::getVertices(Vector2 pos) {
     std::vector<Vector2> vertices;
         int c = (int)Clamp((float)sideCount, 3, 16);
-        // float angleIncrement = 2.0f * 3.14 / sideCount; // Angle between vertices
-        float angleIncrement = (360/c) * 3.14 / sideCount;
 
+        float angleIncrement = 2.0f * M_PI / c;  // Angle between vertices
+        
         for (int i = 0; i < c; i++) {
             float angle = i * angleIncrement;
             Vector2 vertex = {

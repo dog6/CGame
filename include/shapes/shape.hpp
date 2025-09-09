@@ -1,8 +1,15 @@
 #include "../game.hpp"
 #include "../line.hpp"
 
+#ifndef M_PI
+#define M_PI 3.14
+#endif
+
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
+
+
+
 // Interface
 class IShape {
     public:

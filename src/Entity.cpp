@@ -38,30 +38,52 @@ void Entity::update(float dt, Vector2 forces){
 
 }
 
-float bounceStrength = 0.4;
+float bounceStrength = 0.4f;
+
 void Entity::collideWithCameraBorders() {
-    if (doesCollideWithWindow){
-        vector<Vector2> verts = this->shape->getVertices(this->body->position);
-        for (int v = 0; v < verts.size(); v++){
-            if (verts[v].x >= screenWidth){
-                body->position.x -= Vector2Distance(verts[v], Vector2{screenWidth, verts[v].y});
-                body->velocity.x *= -bounceStrength;
-            }
-            if (verts[v].x <= 0){
-                body->position.x += Vector2Distance(verts[v], Vector2{0, verts[v].y});
-                body->velocity.x *= -bounceStrength;
-            }
-            if (verts[v].y >= screenHeight){
-                body->position.y -= Vector2Distance(verts[v], Vector2{verts[v].x, screenHeight});
-                body->velocity.y *= -bounceStrength;
-            }
-            if (verts[v].y <= 0){
-                body->position.y += Vector2Distance(verts[v], Vector2{verts[v].x, 0});
-                body->velocity.y *= -bounceStrength;
-            }
+    if (!doesCollideWithWindow) return;
+
+    // Get world-space vertices of the entity
+    std::vector<Vector2> verts = this->shape->getVertices(this->body->position);
+
+    // Track penetration on each axis
+    float penetrationX = 0.0f;
+    float penetrationY = 0.0f;
+
+    for (const auto& v : verts) {
+        // Check right border
+        if (v.x > screenWidth) {
+            float overlap = v.x - screenWidth;
+            penetrationX = std::max(penetrationX, overlap);
+        }
+        // Check left border
+        if (v.x < 0) {
+            float overlap = v.x;
+            penetrationX = std::min(penetrationX, overlap);
+        }
+        // Check bottom border
+        if (v.y > screenHeight) {
+            float overlap = v.y - screenHeight;
+            penetrationY = std::max(penetrationY, overlap);
+        }
+        // Check top border
+        if (v.y < 0) {
+            float overlap = v.y;
+            penetrationY = std::min(penetrationY, overlap);
         }
     }
+
+    // Apply corrections if needed
+    if (penetrationX != 0.0f) {
+        body->position.x -= penetrationX;
+        body->velocity.x *= -bounceStrength;
+    }
+    if (penetrationY != 0.0f) {
+        body->position.y -= penetrationY;
+        body->velocity.y *= -bounceStrength;
+    }
 }
+
 
 void Entity::setRotation(float r){
     this->rotation = r;

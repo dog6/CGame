@@ -14,11 +14,10 @@ bool ConwayGameOfLife::NeighborAlive(Vector2 pos, Vector2 offset){
     try {
         result = map->tileData[Smallmath::TilemapToIndex(Vector2{pos.x+offset.x, pos.y+offset.y}, map->getSize().x)].isVisible();
     } catch (exception e){
-        TraceLog(LOG_INFO, "Failed to check neighbor", e.what());
+        TraceLog(LOG_INFO, "Failed to check neighbor %s", e.what());
     }
     return result;
 }
-
 
 /* returns pixel location as integer value
     0 - center
@@ -38,24 +37,26 @@ int ConwayGameOfLife::IsEdgePixel(Vector2 pos, Vector2 sz) {
     int maxX = static_cast<int>(sz.x) - 1;
     int maxY = static_cast<int>(sz.y) - 1;
 
-    // Debug print
-    // << "Checking pos (" << x << "," << y << ") on grid (" << maxX + 1 << "x" << maxY + 1 << ")\n"
-    TraceLog(LOG_INFO, "Checking pos: (", x, ", ", y, ")");
+    // Out of bounds check
+    if (x < 0 || y < 0 || x > maxX || y > maxY) {
+        return -1;
+    }
 
-    if (x > 0 && x < maxX && y > 0 && y < maxY) return 0; // center
-    if (x > 0 && x < maxX && y == 0) return 1;            // top edge
-    if (x == maxX && y == 0) return 2;                    // top right corner
-    if (x == maxX && y > 0 && y < maxY) return 3;         // right edge
-    if (x == maxX && y == maxY) return 4;                 // bottom right corner
-    if (x > 0 && x < maxX && y == maxY) return 5;         // bottom edge
-    if (x == 0 && y == maxY) return 6;                    // bottom left corner
-    if (x == 0 && y > 0 && y < maxY) return 7;            // left edge
-    if (x == 0 && y == 0) return 8;                       // top left corner
+    // Corners first
+    if (x == 0     && y == 0)     return 8; // top-left
+    if (x == maxX  && y == 0)     return 2; // top-right
+    if (x == maxX  && y == maxY)  return 4; // bottom-right
+    if (x == 0     && y == maxY)  return 6; // bottom-left
 
-    return -1; // invalid or out of bounds
+    // Edges
+    if (y == 0)    return 1; // top
+    if (x == maxX) return 3; // right
+    if (y == maxY) return 5; // bottom
+    if (x == 0)    return 7; // left
+
+    // Otherwise it's inside (center)
+    return 0;
 }
-
-
 
 bool ConwayGameOfLife::NotMovingTowards(Vector2 checkingDir, Vector2 possibleDir) {
     return (checkingDir.x != possibleDir.x || checkingDir.y != possibleDir.y);
@@ -70,74 +71,35 @@ const std::array<Vector2, 8> offsets{ Vector2{-1, -1}, Vector2{0, -1}, Vector2{1
 Vector2{-1, 0},                  Vector2{1, 0},
 Vector2{-1, 1}, Vector2{0, 1},   Vector2{1, 1} };
 
-
-int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map){
-    if (map == nullptr){
+int ConwayGameOfLife::CountNeighbors(Vector2 pos, Tilemap* map) {
+    if (map == nullptr) {
         TraceLog(LOG_ERROR, "Unable to count neighbors, map is null");
+        return 0;
     }
-    
-    TraceLog(LOG_INFO, "Counting neighbors @ position ", pos.x, ", ", pos.y);
+
     int livingNeighbors = 0;
-    
-    
-    int pixelType = IsEdgePixel(pos, map->getSize());
-    TraceLog(LOG_INFO, "PixelType: ", pixelType);    
-    for (int i = 0; i < offsets.size()-1; i++){
-        switch(pixelType){
-            case -1:
-                TraceLog(LOG_ERROR, "[/IsEdgePixel] Unidentified pixel location");
-            break;
-            case 0: // center
-                if (NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break; 
-            case 1: // north
-                if (NotMovingTowards(offsets[i], NORTH, NORTH_EAST, NORTH_WEST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 2: // north-east
-                if (NotMovingTowards(offsets[i], NORTH, NORTH_EAST, NORTH_WEST, EAST, SOUTH_EAST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 3: // east
-                if (NotMovingTowards(offsets[i], EAST, NORTH_EAST, SOUTH_EAST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 4: // south-east
-                if (NotMovingTowards(offsets[i], SOUTH, SOUTH_EAST, SOUTH_WEST, EAST, NORTH_EAST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 5: // south
-                if (NotMovingTowards(offsets[i], SOUTH, SOUTH_EAST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 6: // south-west
-                if (NotMovingTowards(offsets[i], SOUTH_WEST, SOUTH_EAST, SOUTH, WEST, NORTH_WEST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 7: // west
-                if (NotMovingTowards(offsets[i], WEST, NORTH_WEST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            case 8: // north-west
-                if (NotMovingTowards(offsets[i], NORTH, WEST, NORTH_WEST, NORTH_EAST, SOUTH_WEST) && NeighborAlive(pos, offsets[i])){
-                    livingNeighbors++;
-                }
-            break;
-            default:
-                TraceLog(LOG_ERROR, "Failed to count neighbors");
-            break;
+    Vector2 mapSize = map->getSize();
+
+    // Offsets for all 8 neighbors (relative to pos)
+    std::vector<Vector2> neighborOffsets = {
+        { -1, -1 }, { 0, -1 }, { 1, -1 },  // top-left, top, top-right
+        { -1,  0 },           { 1,  0 },   // left,        right
+        { -1,  1 }, { 0,  1 }, { 1,  1 }   // bottom-left, bottom, bottom-right
+    };
+
+    for (auto& offset : neighborOffsets) {
+        Vector2 neighborPos = { pos.x + offset.x, pos.y + offset.y };
+
+        // Skip neighbors outside the map bounds
+        if (neighborPos.x < 0 || neighborPos.y < 0 || neighborPos.x >= mapSize.x || neighborPos.y >= mapSize.y)
+            continue;
+
+        // Pass the relative offset to NeighborAlive as required
+        if (NeighborAlive(pos, offset)) {
+            livingNeighbors++;
         }
     }
-    TraceLog(LOG_INFO, "Counted ", livingNeighbors, " neighbors");
+
     return livingNeighbors;
 }
 
@@ -246,12 +208,14 @@ ConwayGameOfLife::~ConwayGameOfLife() {
 };
 
 void ConwayGameOfLife::NextGeneration(){
-    TraceLog(LOG_INFO, "Running generation ", generations);
+    TraceLog(LOG_INFO, "Running generation %d", generations);
     std::vector<Tile> newTileData = map->tileData; // make copy of tileData
     // look through each tile, find alive neighbors
-    for (int i = Smallmath::Vector2Product(map->getSize()); i > 0; i--) {
+    int totalCells = Smallmath::Vector2Product(map->getSize());
+    for (int i = totalCells - 1; i > 0; i--) {
         Vector2 pos = Smallmath::IndexToTilemap(i, map->getSize().x);
         int livingNeighbors = CountNeighbors(pos, map);
+        // TraceLog(LOG_INFO, "Neighbors: %d", livingNeighbors);
         if (newTileData[i].isVisible()){
             // Any live cell with two or three live neighbours lives on to the next generation.
             if (livingNeighbors != 2 && livingNeighbors != 3){
@@ -322,7 +286,6 @@ void ConwayGameOfLife::load(){
     TraceLog(LOG_INFO, "Creating tilemap entity for CGOL..");
     // Create entities
     tilemap = new Entity("first tilemap", Vector2{50,50}, true);
-    // tilemapSize = Smallmath::Vector2LargerValue(Vector2{(screenWidth/(tileSize+tileGap)), (screenHeight/(tileSize+tileGap))});
     tilemapSize = 128;
     map = new Tilemap(Vector2Zero(), Vector2{tilemapSize, tilemapSize}, Vector2{tileSize, tileSize}, tileGap);
     tilemap->shape = map; // give tilemap its shape
@@ -343,12 +306,6 @@ void ConwayGameOfLife::load(){
 void ConwayGameOfLife::start(){
     TraceLog(LOG_INFO, "Starting CGOL..");
     
-    /*try {
-        GuiLoadStyle(guiStylePath);
-    }catch (exception e){
-        TraceLog(LOG_ERROR, "Failed to load gui style.\n", e.what());
-    }*/
-
     // set default menu settings
     gameState.mapSizeValue = map->getSize().x;
     gameState.tileSizeValue = this->tileSize;
@@ -356,11 +313,6 @@ void ConwayGameOfLife::start(){
     gameState.tileGapValue = this->tileGap;
 
     // Create tilemap
-    /*map->setTileData(WHITE, map->getSize(), false);
-    map->hasOutline = true;
-    map->outlineColor = WHITE;
-    map->defaultVisible = false; // when map is refreshed, tiles should not be visible
-    tilemap->shape = map; // give tilemap it's shape*/
     map->setTileData(WHITE, map->getSize(), false);
     map->hasOutline = true;
     map->outlineColor = WHITE;
