@@ -29,11 +29,11 @@ echo.
 
 :: Compile code
 echo Compiling..
-echo g++ !sources! -o bin/%PROJECT_NAME%.exe -Llib/raylib -lraylib -lopengl32 -lgdi32 -lwinmm
+echo g++ !sources! -o bin/%PROJECT_NAME%.exe -Llib/raylib -lraylib -Llib/raygui -lopengl32 -lgdi32 -lwinmm
 echo.
 echo -------------------------------------------------------------------------------------------------------------------
 echo.
-g++ !sources! -o bin/%PROJECT_NAME%.exe -Llib/raylib -lraylib -lopengl32 -lgdi32 -lwinmm
+g++ !sources! -o bin/%PROJECT_NAME%.exe -Llib/raylib -lraylib -Llib/raygui -lopengl32 -lgdi32 -lwinmm
 
 :: try to run .exe
 if exist bin/%PROJECT_NAME%.exe (
